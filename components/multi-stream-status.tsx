@@ -4,9 +4,25 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Radio } from "lucide-react"
 import { siteConfig } from "@/lib/config"
+import { useTwitchStatus } from "@/lib/hooks/use-twitch-status"
 
 export function MultiStreamStatus() {
-  const activeStreams = siteConfig.multiStreamStatus.platforms.filter((p) => p.isLive)
+  const { status: twitchStatus } = useTwitchStatus()
+  
+  // Update the platforms with real Twitch data
+  const platforms = siteConfig.multiStreamStatus.platforms.map(platform => {
+    if (platform.platform === "Twitch") {
+      return {
+        ...platform,
+        isLive: twitchStatus.isLive,
+        title: twitchStatus.title || platform.title,
+        viewers: twitchStatus.viewerCount ? twitchStatus.viewerCount.toLocaleString() : platform.viewers,
+      }
+    }
+    return platform
+  })
+  
+  const activeStreams = platforms.filter((p) => p.isLive)
 
   if (activeStreams.length === 0) {
     return null

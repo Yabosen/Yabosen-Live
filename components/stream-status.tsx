@@ -4,11 +4,19 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Radio } from "lucide-react"
 import { siteConfig } from "@/lib/config"
+import { useTwitchStatus } from "@/lib/hooks/use-twitch-status"
 
 export function StreamStatus() {
   const { streamStatus } = siteConfig
+  const { status: twitchStatus, loading } = useTwitchStatus()
 
-  if (!streamStatus.isLive) {
+  // Use real Twitch status if available, fallback to config
+  const isLive = twitchStatus.isLive || streamStatus.isLive
+  const title = twitchStatus.title || streamStatus.title
+  const gameName = twitchStatus.gameName
+  const viewerCount = twitchStatus.viewerCount
+
+  if (!isLive) {
     return null
   }
 
@@ -36,8 +44,12 @@ export function StreamStatus() {
             <Badge variant="destructive" className="w-fit bg-primary hover:bg-primary text-primary-foreground">
               LIVE NOW
             </Badge>
-            <p className="text-sm font-medium text-foreground">{streamStatus.title}</p>
-            <p className="text-xs text-muted-foreground">on {streamStatus.platform}</p>
+            <p className="text-sm font-medium text-foreground">{title}</p>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>on {streamStatus.platform}</span>
+              {gameName && <span>• {gameName}</span>}
+              {viewerCount && <span>• {viewerCount.toLocaleString()} viewers</span>}
+            </div>
           </div>
         </div>
       </Card>
