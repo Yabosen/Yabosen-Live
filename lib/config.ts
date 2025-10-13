@@ -139,7 +139,7 @@ export const siteConfig = {
   // Live Stream Status
   // Set isLive to true when streaming, false when offline
   streamStatus: {
-    isLive: false,
+    isLive: true,
     platform: "Twitch",
     streamUrl: "https://www.twitch.tv/yab0sen",
     title: "Chill Gaming Session",
