@@ -11,7 +11,7 @@ export const siteConfig = {
   avatarUrl: "/emo-avatar.png",
 
   // Donate URL
-  donateUrl: "https://paypal.me/yabosensnowy",
+  donateUrl:"https://www.tipeeestream.com/yabosen/donation",
 
   // Personal Info Boxes (like Status, Goal, Nationality)
   personalInfo: [
