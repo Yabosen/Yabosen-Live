@@ -137,12 +137,12 @@ export const siteConfig = {
   ],
 
   // Live Stream Status
-  // Set isLive to true when streaming, false when offline
+  // This will be overridden by real Twitch API data
   streamStatus: {
-    isLive: true,
+    isLive: false, // Will be updated by Twitch API
     platform: "Twitch",
     streamUrl: "https://www.twitch.tv/yab0sen",
-    title: "Chill Gaming Session",
+    title: "Chill Gaming Session", // Fallback title
     // Position: "top-right", "top-left", "bottom-right", "bottom-left"
     position: "top-right" as const,
   },
@@ -153,10 +153,10 @@ export const siteConfig = {
     platforms: [
       {
         platform: "Twitch",
-        isLive: false,
+        isLive: false, // Will be updated by Twitch API
         streamUrl: "https://www.twitch.tv/yab0sen",
-        title: "Chill Gaming Session",
-        viewers: "1.2K", // Optional: viewer count
+        title: "Chill Gaming Session", // Fallback title
+        viewers: "", // Will be updated by Twitch API
       },
       {
         platform: "YouTube",
