@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 
+// Ensure this route is not statically cached by Next.js
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     // Twitch API credentials - you'll need to set these as environment variables
     const CLIENT_ID = process.env.TWITCH_CLIENT_ID
     const CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET
+    const TWITCH_USERNAME = process.env.TWITCH_USERNAME || 'yab0sen'
     
     if (!CLIENT_ID || !CLIENT_SECRET) {
       return NextResponse.json(
@@ -24,6 +28,8 @@ export async function GET() {
         client_secret: CLIENT_SECRET,
         grant_type: 'client_credentials',
       }),
+      // Never cache OAuth token responses
+      cache: 'no-store',
     })
 
     if (!tokenResponse.ok) {
@@ -33,14 +39,16 @@ export async function GET() {
     const tokenData = await tokenResponse.json()
     const accessToken = tokenData.access_token
 
-    // Check if yab0sen is live
+    // Check if the configured user is live
     const streamResponse = await fetch(
-      'https://api.twitch.tv/helix/streams?user_login=yab0sen',
+      `https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(TWITCH_USERNAME)}`,
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Client-Id': CLIENT_ID,
         },
+        // Always fetch fresh stream status
+        cache: 'no-store',
       }
     )
 
@@ -60,17 +68,17 @@ export async function GET() {
         viewerCount: stream.viewer_count,
         startedAt: stream.started_at,
         thumbnailUrl: stream.thumbnail_url,
-      })
+      }, { headers: { 'Cache-Control': 'no-store' } })
     } else {
       return NextResponse.json({
         isLive: false,
-      })
+      }, { headers: { 'Cache-Control': 'no-store' } })
     }
   } catch (error) {
     console.error('Error checking Twitch status:', error)
     return NextResponse.json(
       { error: 'Failed to check stream status' },
-      { status: 500 }
+      { status: 500, headers: { 'Cache-Control': 'no-store' } }
     )
   }
 }

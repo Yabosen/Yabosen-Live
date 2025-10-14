@@ -22,7 +22,7 @@ export function useTwitchStatus() {
         setLoading(true)
         setError(null)
         
-        const response = await fetch('/api/twitch-status')
+        const response = await fetch('/api/twitch-status', { cache: 'no-store' })
         
         if (!response.ok) {
           throw new Error('Failed to fetch stream status')

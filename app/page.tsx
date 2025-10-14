@@ -1,6 +1,7 @@
 import { siteConfig } from "@/lib/config"
 import { SocialLinkButton } from "@/components/social-link-button"
 import { MultiStreamStatus } from "@/components/multi-stream-status"
+import { StreamStatus } from "@/components/stream-status"
 import { TopNav } from "@/components/top-nav"
 import { PersonalInfo } from "@/components/personal-info"
 import { CSStats } from "@/components/cs-stats"
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
       <TopNav />
+      <StreamStatus />
 
       <main className="min-h-screen bg-background pt-14">
         <div className="container max-w-3xl mx-auto px-4 py-12">
