@@ -3,10 +3,16 @@
 import { Button } from "@/components/ui/button"
 import { Heart } from "lucide-react"
 import { siteConfig } from "@/lib/config"
+import { useTwitchStatus } from "@/lib/hooks/use-twitch-status"
 
 export function TopNav() {
-  const isLive = siteConfig.multiStreamStatus.platforms.some((p) => p.isLive)
+ 
+  const { streamStatus } = siteConfig
+  const { status: twitchStatus, loading } = useTwitchStatus()
 
+  // Use real Twitch status if available, fallback to config
+  const isLive = twitchStatus.isLive || streamStatus.isLive
+  
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-primary border-b border-primary/20">
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
