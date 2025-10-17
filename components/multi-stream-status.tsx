@@ -31,6 +31,12 @@ export function MultiStreamStatus() {
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
       <Card className="bg-card/95 backdrop-blur-sm border-primary/50 shadow-xl shadow-primary/20">
+          <button
+          onClick={() => setVisible(false)}
+          className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
