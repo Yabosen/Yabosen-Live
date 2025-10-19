@@ -74,6 +74,11 @@ export const siteConfig = {
       url: "https://kick.com/yabosen",
       icon: "kick",
     },
+    {
+      name: "Telegram Channel",
+      url: "https://t.me/Yabosenchan",
+      icon: "Telegram",
+    },
   ],
 
   // Other Social Links (displayed as icon grid)
