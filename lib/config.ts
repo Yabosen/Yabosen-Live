@@ -77,7 +77,7 @@ export const siteConfig = {
     {
       name: "Telegram Channel",
       url: "https://t.me/Yabosenchan",
-      icon: "Telegram",
+      icon: "mastodon",
     },
   ],
 
