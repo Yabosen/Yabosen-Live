@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   title: `${siteConfig.name} - Links`,
   description: siteConfig.bio,
   generator: "v0.app",
+  icons: {
+    icon: "/emo-avatar.png",
+    shortcut: "/emo-avatar.png",
+    apple: "/emo-avatar.png",
+  },
 }
 
 export default function RootLayout({
