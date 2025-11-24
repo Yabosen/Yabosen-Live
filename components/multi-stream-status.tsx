@@ -2,21 +2,21 @@
 
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Radio } from "lucide-react"
+import { Circle } from "lucide-react"
 import { siteConfig } from "@/lib/config"
-import { useTwitchStatus } from "@/lib/hooks/use-twitch-status"
+import { useDiscordStatus } from "@/lib/hooks/use-discord-status"
 
 export function MultiStreamStatus() {
-  const { status: twitchStatus } = useTwitchStatus()
+  const { status: discordStatus } = useDiscordStatus()
   
-  // Update the platforms with real Twitch data
+  // Update the platforms with real Discord data
   const platforms = siteConfig.multiStreamStatus.platforms.map(platform => {
-    if (platform.platform === "Twitch") {
+    if (platform.platform === "Discord") {
       return {
         ...platform,
-        isLive: twitchStatus.isLive,
-        title: twitchStatus.title || platform.title,
-        viewers: twitchStatus.viewerCount ? twitchStatus.viewerCount.toLocaleString() : platform.viewers,
+        isLive: discordStatus.isOnline,
+        title: discordStatus.status ? `Status: ${discordStatus.status.toUpperCase()}` : platform.title,
+        viewers: discordStatus.username || "",
       }
     }
     return platform
@@ -28,29 +28,37 @@ export function MultiStreamStatus() {
     return null
   }
 
+  const statusColors = {
+    online: "bg-green-500",
+    idle: "bg-yellow-500",
+    dnd: "bg-red-500",
+    offline: "bg-gray-500",
+  }
+
+  const statusLabels = {
+    online: "ONLINE",
+    idle: "IDLE",
+    dnd: "DO NOT DISTURB",
+    offline: "OFFLINE",
+  }
+
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
       <Card className="bg-card/95 backdrop-blur-sm border-primary/50 shadow-xl shadow-primary/20">
-          <button
-          onClick={() => setVisible(false)}
-          className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
             <div className="relative">
-              <Radio className="h-6 w-6 text-primary animate-pulse" />
-              <span className="absolute inset-0 h-6 w-6 rounded-full bg-primary/30 animate-ping" />
+              <Circle className={`h-6 w-6 ${statusColors[discordStatus.status || 'offline']} animate-pulse`} fill="currentColor" />
+              <span className={`absolute inset-0 h-6 w-6 rounded-full ${statusColors[discordStatus.status || 'offline']}/30 animate-ping`} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground">Currently Streaming</h3>
-              <p className="text-sm text-muted-foreground">Click to watch on your preferred platform</p>
+              <h3 className="text-lg font-bold text-foreground">Discord Status</h3>
+              <p className="text-sm text-muted-foreground">Current online status</p>
             </div>
           </div>
 
-          {/* Stream Platforms */}
+          {/* Discord Status */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {activeStreams.map((stream) => (
               <a
@@ -62,7 +70,7 @@ export function MultiStreamStatus() {
               >
                 <div className="flex items-center gap-3">
                   <Badge variant="destructive" className="bg-primary hover:bg-primary text-primary-foreground">
-                    LIVE
+                    {statusLabels[discordStatus.status || 'offline']}
                   </Badge>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
@@ -71,7 +79,7 @@ export function MultiStreamStatus() {
                     <p className="text-sm text-muted-foreground truncate">{stream.title}</p>
                   </div>
                 </div>
-                {stream.viewers && <p className="text-xs text-muted-foreground mt-2">{stream.viewers} watching</p>}
+                {discordStatus.username && <p className="text-xs text-muted-foreground mt-2">@{discordStatus.username}</p>}
               </a>
             ))}
           </div>
