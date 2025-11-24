@@ -5,10 +5,12 @@ import { TopNav } from "@/components/top-nav"
 import { PersonalInfo } from "@/components/personal-info"
 import { CSStats } from "@/components/cs-stats"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
 
 export default function Home() {
   return (
     <>
+      <RickRollEasterEgg />
       <TopNav />
 
       <main className="min-h-screen bg-background pt-14">
