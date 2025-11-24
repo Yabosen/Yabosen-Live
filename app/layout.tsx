@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: siteConfig.bio,
   generator: "v0.app",
   icons: {
-    icon: "/emo-avatar.png",
+    icon: "/icon-mos.png",
     shortcut: "/emo-avatar.png",
     apple: "/emo-avatar.png",
   },
