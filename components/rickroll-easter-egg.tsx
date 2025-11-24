@@ -57,7 +57,7 @@ export function RickRollEasterEgg() {
         iframe.style.opacity = "0"
         iframe.style.pointerEvents = "none"
         iframe.style.zIndex = "-1"
-        iframe.src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0&loop=1&playlist=dQw4w9WgXcQ"
+        iframe.src = "https://www.youtube.com/embed/1uX1vGkd6zI?autoplay=1&mute=0&loop=1&playlist=1uX1vGkd6zI"
         iframe.allow = "autoplay; encrypted-media"
         iframe.allowFullscreen = false
         document.body.appendChild(iframe)
