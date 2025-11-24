@@ -136,27 +136,27 @@ export const siteConfig = {
     { name: "Steam Group", url: "https://steamcommunity.com/groups/AmnesicAim", icon: "steam" },
   ],
 
-  // Live Stream Status
-  // This will be overridden by real Twitch API data
+  // Discord Status
+  // This will be overridden by real Discord API data
   streamStatus: {
-    isLive: false, // Will be updated by Twitch API
-    platform: "Twitch",
-    streamUrl: "https://www.twitch.tv/yab0sen",
-    title: "Chill Gaming Session", // Fallback title
+    isLive: false, // Will be updated by Discord API (isOnline status)
+    platform: "Discord",
+    streamUrl: "https://discord.com", // Discord profile or server link
+    title: "Discord Status", // Fallback title
     // Position: "top-right", "top-left", "bottom-right", "bottom-left"
     position: "top-right" as const,
   },
 
-  // Multi-Platform Stream Status (Bottom section - multiple platforms)
-  // Set isLive to true for each platform you're streaming on
+  // Multi-Platform Status (Bottom section - multiple platforms)
+  // Set isLive to true for each platform you're active on
   multiStreamStatus: {
     platforms: [
       {
-        platform: "Twitch",
-        isLive: false, // Will be updated by Twitch API
-        streamUrl: "https://www.twitch.tv/yab0sen",
-        title: "Chill Gaming Session", // Fallback title
-        viewers: "", // Will be updated by Twitch API
+        platform: "Discord",
+        isLive: false, // Will be updated by Discord API (isOnline status)
+        streamUrl: "https://discord.com", // Discord profile or server link
+        title: "Discord Status", // Fallback title
+        viewers: "", // Will show username if available
       },
       {
         platform: "YouTube",

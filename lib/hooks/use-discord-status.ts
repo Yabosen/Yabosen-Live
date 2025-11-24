@@ -2,17 +2,15 @@
 
 import { useState, useEffect } from 'react'
 
-interface TwitchStatus {
-  isLive: boolean
-  title?: string
-  gameName?: string
-  viewerCount?: number
-  startedAt?: string
-  thumbnailUrl?: string
+interface DiscordStatus {
+  isOnline: boolean
+  status?: 'online' | 'offline' | 'idle' | 'dnd'
+  username?: string
+  error?: string
 }
 
-export function useTwitchStatus() {
-  const [status, setStatus] = useState<TwitchStatus>({ isLive: false })
+export function useDiscordStatus() {
+  const [status, setStatus] = useState<DiscordStatus>({ isOnline: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,17 +20,19 @@ export function useTwitchStatus() {
         setLoading(true)
         setError(null)
         
-        const response = await fetch('/api/twitch-status')
+        const response = await fetch('/api/discord-status')
         
         if (!response.ok) {
-          throw new Error('Failed to fetch stream status')
+          throw new Error('Failed to fetch Discord status')
         }
         
         const data = await response.json()
         setStatus(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error')
-        console.error('Error fetching Twitch status:', err)
+        console.error('Error fetching Discord status:', err)
+        // Set offline status on error
+        setStatus({ isOnline: false, status: 'offline' })
       } finally {
         setLoading(false)
       }
@@ -41,11 +41,12 @@ export function useTwitchStatus() {
     // Fetch immediately
     fetchStatus()
 
-    // Set up polling every 30 seconds
-    const interval = setInterval(fetchStatus, 30000)
+    // Set up polling every hour (3600000ms)
+    const interval = setInterval(fetchStatus, 3600000)
 
     return () => clearInterval(interval)
   }, [])
 
   return { status, loading, error }
 }
+
