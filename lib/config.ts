@@ -21,7 +21,7 @@ export const siteConfig = {
   ],
 
   // Custom text (Japanese or any other text you want to display)
-  customText: ["愛してる自殺しないでください", "彼らは私を怒れている", "彼らは私に苦しみを与えたいのです"],
+  customText: ["なんとかガールフレンドの鼻にボールピアスを開けることができたんだけど、すごく醜いけど愛の方が大事だと思った"],
 
   // Counter-Strike Stats
   csStats: {
