@@ -2,17 +2,78 @@
 
 import { useEffect, useRef, useState } from "react"
 
+// Helper to play YouTube video in hidden iframe
+function playYouTubeVideo(videoId: string, duration: number): HTMLIFrameElement {
+  const iframe = document.createElement("iframe")
+  iframe.style.position = "fixed"
+  iframe.style.top = "0"
+  iframe.style.left = "0"
+  iframe.style.width = "1px"
+  iframe.style.height = "1px"
+  iframe.style.opacity = "0"
+  iframe.style.pointerEvents = "none"
+  iframe.style.zIndex = "-1"
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}`
+  iframe.allow = "autoplay; encrypted-media"
+  iframe.allowFullscreen = false
+  document.body.appendChild(iframe)
+
+  // Clean up iframe after song ends
+  setTimeout(() => {
+    if (iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe)
+    }
+  }, duration)
+
+  return iframe
+}
+
 export function RickRollEasterEgg() {
   const [spaceCount, setSpaceCount] = useState(0)
+  const [wasdSequence, setWasdSequence] = useState("")
   const lastPressTime = useRef<number>(0)
+  const lastWasdTime = useRef<number>(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayed = useRef(false)
+  const wasdPlayed = useRef(false)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only listen to space bar
+      const key = e.key.toLowerCase()
+      const now = Date.now()
+
+      // --- WASD Easter Egg ---
+      if (['w', 'a', 's', 'd'].includes(key)) {
+        const timeSinceLastWasd = now - lastWasdTime.current
+
+        // Reset if more than 2 seconds have passed
+        if (timeSinceLastWasd > 2000) {
+          setWasdSequence(key)
+        } else {
+          setWasdSequence(prev => {
+            const newSeq = prev + key
+
+            // Check if sequence is "wasd"
+            if (newSeq === "wasd" && !wasdPlayed.current) {
+              wasdPlayed.current = true
+              playYouTubeVideo("e9-6kJ8repQ", 180000) // 3 minutes
+              setTimeout(() => {
+                wasdPlayed.current = false
+              }, 180000)
+              return ""
+            }
+
+            // Keep only last 4 characters
+            return newSeq.slice(-4)
+          })
+        }
+        lastWasdTime.current = now
+        return
+      }
+
+      // --- Space Bar Easter Egg ---
       if (e.code !== "Space" && e.key !== " ") {
-        // Reset count if any other key is pressed
+        // Reset space count if any other key is pressed (except wasd)
         setSpaceCount(0)
         lastPressTime.current = 0
         return
@@ -23,7 +84,6 @@ export function RickRollEasterEgg() {
         e.preventDefault()
       }
 
-      const now = Date.now()
       const timeSinceLastPress = now - lastPressTime.current
 
       // Reset if more than 2 seconds have passed since last press
@@ -41,38 +101,12 @@ export function RickRollEasterEgg() {
       // If we've reached 5 presses, play the song
       if (newCount >= 5 && !hasPlayed.current) {
         hasPlayed.current = true
+        playYouTubeVideo("VfQRSjAh_EA", 215000) // 3.5 minutes
 
-        // Create and play audio using YouTube's audio stream
-        // Using a reliable audio source - you may want to host your own audio file
-        const audio = new Audio()
-
-        // Using a direct link to the audio (you can replace this with your own hosted file)
-        // For now, we'll use a YouTube embed approach since direct audio links are restricted
-        const iframe = document.createElement("iframe")
-        iframe.style.position = "fixed"
-        iframe.style.top = "0"
-        iframe.style.left = "0"
-        iframe.style.width = "1px"
-        iframe.style.height = "1px"
-        iframe.style.opacity = "0"
-        iframe.style.pointerEvents = "none"
-        iframe.style.zIndex = "-1"
-        iframe.src = "https://www.youtube.com/embed/VfQRSjAh_EA?autoplay=1&mute=0&loop=1&playlist=VfQRSjAh_EA"
-        iframe.allow = "autoplay; encrypted-media"
-        iframe.allowFullscreen = false
-        document.body.appendChild(iframe)
-
-        // Store reference for cleanup
-        audioRef.current = audio
-
-        // Clean up iframe after song ends (approximately 3.5 minutes)
         setTimeout(() => {
-          if (iframe.parentNode) {
-            iframe.parentNode.removeChild(iframe)
-          }
-          hasPlayed.current = false // Allow it to be triggered again
+          hasPlayed.current = false
           setSpaceCount(0)
-        }, 215000) // 3 minutes 35 seconds
+        }, 215000)
       }
     }
 
@@ -85,8 +119,7 @@ export function RickRollEasterEgg() {
         audioRef.current = null
       }
     }
-  }, [spaceCount])
+  }, [spaceCount, wasdSequence])
 
   return null // This component doesn't render anything
 }
-
