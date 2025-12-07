@@ -41,11 +41,11 @@ export function RickRollEasterEgg() {
       // If we've reached 5 presses, play the song
       if (newCount >= 5 && !hasPlayed.current) {
         hasPlayed.current = true
-        
+
         // Create and play audio using YouTube's audio stream
         // Using a reliable audio source - you may want to host your own audio file
         const audio = new Audio()
-        
+
         // Using a direct link to the audio (you can replace this with your own hosted file)
         // For now, we'll use a YouTube embed approach since direct audio links are restricted
         const iframe = document.createElement("iframe")
@@ -57,7 +57,7 @@ export function RickRollEasterEgg() {
         iframe.style.opacity = "0"
         iframe.style.pointerEvents = "none"
         iframe.style.zIndex = "-1"
-        iframe.src = "https://www.youtube.com/embed/1uX1vGkd6zI?autoplay=1&mute=0&loop=1&playlist=1uX1vGkd6zI"
+        iframe.src = "https://www.youtube.com/embed/VfQRSjAh_EA?autoplay=1&mute=0&loop=1&playlist=VfQRSjAh_EA"
         iframe.allow = "autoplay; encrypted-media"
         iframe.allowFullscreen = false
         document.body.appendChild(iframe)
