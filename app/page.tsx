@@ -1,86 +1,112 @@
 import { siteConfig } from "@/lib/config"
-import { SocialLinkButton } from "@/components/social-link-button"
-import { MultiStreamStatus } from "@/components/multi-stream-status"
-import { TopNav } from "@/components/top-nav"
-import { PersonalInfo } from "@/components/personal-info"
-import { CSStats } from "@/components/cs-stats"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
+import { AnimatedAvatar } from "@/components/animated-avatar"
+import { LinkCard } from "@/components/link-card"
+import { DiscordStatusIndicator } from "@/components/discord-status-indicator"
+import { LastFmWidget } from "@/components/lastfm-widget"
+import {
+  TwitchIcon,
+  Youtube,
+  Radio,
+  Music,
+  Gamepad2,
+  BarChart3,
+  Trophy,
+  Link as LinkIcon
+} from "lucide-react"
 
 export default function Home() {
   return (
-    <>
-      <RickRollEasterEgg />
-      <TopNav />
+    <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-3xl mx-auto">
+        {/* Profile Header Section */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-12">
+          {/* Animated Avatar */}
+          <AnimatedAvatar
+            src={siteConfig.avatarUrl || "/emo-avatar.png"}
+            alt={siteConfig.name}
+            size={140}
+          />
 
-      <main className="min-h-screen bg-background pt-14">
-        <div className="container max-w-3xl mx-auto px-4 py-12">
-          {/* Profile Section */}
-          <div className="flex flex-col items-center text-center mb-8">
-            <Avatar className="h-32 w-32 mb-6 ring-4 ring-primary/20">
-              <AvatarImage src={siteConfig.avatarUrl || "/placeholder.svg"} alt={siteConfig.name} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-3xl font-bold">
-                {siteConfig.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">{siteConfig.name}</h1>
+          {/* Name and Description */}
+          <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-2">
+              {siteConfig.name}
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base mb-3 max-w-md">
+              {siteConfig.bio}
+            </p>
+            <DiscordStatusIndicator />
           </div>
-
-          <PersonalInfo />
-
-          <CSStats />
-
-          {/* My Socials Heading */}
-          <h2 className="text-2xl font-bold mb-6">My Socials:</h2>
-
-          {/* Featured Social Links */}
-          <div className="space-y-3 mb-8">
-            {siteConfig.featuredSocialLinks.map((link) => (
-              <SocialLinkButton key={link.url} name={link.name} url={link.url} icon={link.icon} variant="full" />
-            ))}
-          </div>
-
-          {/* Social Icons Grid */}
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-9 gap-3 mb-12">
-            {siteConfig.socialLinks.map((link, index) => (
-              <SocialLinkButton
-                key={`${link.url}-${index}`}
-                name={link.name}
-                url={link.url}
-                icon={link.icon}
-                variant="icon"
-              />
-            ))}
-          </div>
-
-          <h2 className="text-2xl font-bold mb-6">My Communities:</h2>
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-9 gap-3 mb-12">
-            {siteConfig.communities.map((community, index) => (
-              <SocialLinkButton
-                key={`${community.url}-${index}`}
-                name={community.name}
-                url={community.url}
-                icon={community.icon}
-                variant="icon"
-              />
-            ))}
-          </div>
-
-          {/* Multi-platform Stream Status Section */}
-          <div className="mt-12">
-            <MultiStreamStatus />
-          </div>
-
-          {/* Footer */}
-          <p className="text-center text-muted-foreground text-sm mt-12">
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
-          </p>
         </div>
-      </main>
-    </>
+
+        {/* Link Cards Grid */}
+        <div className="space-y-4">
+          {/* Row 1: Streaming Platforms */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <LinkCard
+              name="Twitch"
+              url="https://www.twitch.tv/yab0sen"
+              icon={<TwitchIcon className="h-8 w-8" />}
+            />
+            <LinkCard
+              name="YouTube"
+              url="https://www.youtube.com/@Yabosen"
+              icon={<Youtube className="h-8 w-8" />}
+            />
+            <LinkCard
+              name="Kick"
+              url="https://kick.com/yabosen"
+              icon={<Radio className="h-8 w-8" />}
+            />
+            <LinkCard
+              name="TikTok"
+              url="https://www.tiktok.com/@yabosen56"
+              icon={<Music className="h-8 w-8" />}
+            />
+          </div>
+
+          {/* Row 2: Gaming Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <LinkCard
+              name="Faceit"
+              url="https://www.faceit.com/en/players/Yabosen"
+              icon={<Gamepad2 className="h-8 w-8" />}
+            />
+            <LinkCard
+              name="CS Stats"
+              url="https://csstats.gg/player/76561198981651703"
+              icon={<BarChart3 className="h-8 w-8" />}
+            />
+            <LinkCard
+              name="Leetify"
+              url="https://leetify.com/@yabosen"
+              icon={<Trophy className="h-8 w-8" />}
+            />
+          </div>
+        </div>
+
+        {/* Last.fm Widget */}
+        <div className="mt-8">
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Currently Listening</p>
+          <LastFmWidget />
+        </div>
+
+        {/* Link to full socials page */}
+        <div className="mt-12 text-center">
+          <a
+            href="/yabo"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+          >
+            <LinkIcon className="h-4 w-4 group-hover:scale-110 transition-transform" />
+            View all links & socials
+          </a>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-muted-foreground text-xs mt-8">
+          © {new Date().getFullYear()} {siteConfig.name}
+        </p>
+      </div>
+    </main>
   )
 }
