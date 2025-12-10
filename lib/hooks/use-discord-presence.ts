@@ -81,94 +81,20 @@ export function useDiscordPresence() {
         setError(null)
     }, [])
 
-    const connect = useCallback(() => {
-        // Clean up existing connection
-        if (wsRef.current) {
-            wsRef.current.close()
-        }
-        if (heartbeatIntervalRef.current) {
-            clearInterval(heartbeatIntervalRef.current)
-        }
-
-        try {
-            const ws = new WebSocket(LANYARD_WS_URL)
-            wsRef.current = ws
-
-            ws.onopen = () => {
-                reconnectAttemptsRef.current = 0
-            }
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data)
-
-                switch (data.op) {
-                    case Opcodes.Hello:
-                        // Send initialize message to subscribe to user
-                        ws.send(JSON.stringify({
-                            op: Opcodes.Initialize,
-                            d: {
-                                subscribe_to_id: DISCORD_USER_ID
-                            }
-                        }))
-
-                        // Start heartbeat
-                        const heartbeatInterval = data.d.heartbeat_interval
-                        heartbeatIntervalRef.current = setInterval(() => {
-                            if (ws.readyState === WebSocket.OPEN) {
-                                ws.send(JSON.stringify({ op: Opcodes.Heartbeat }))
-                            }
-                        }, heartbeatInterval)
-                        break
-
-                    case Opcodes.Event:
-                        if (data.t === 'INIT_STATE' || data.t === 'PRESENCE_UPDATE') {
-                            parsePresenceData(data.d)
-                        }
-                        break
-                }
-            }
-
-            ws.onerror = () => {
-                setError('WebSocket connection error')
-            }
-
-            ws.onclose = () => {
-                // Clear heartbeat
-                if (heartbeatIntervalRef.current) {
-                    clearInterval(heartbeatIntervalRef.current)
-                    heartbeatIntervalRef.current = null
-                }
-
-                // Exponential backoff reconnect
-                const backoffTime = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000)
-                reconnectAttemptsRef.current++
-
-                reconnectTimeoutRef.current = setTimeout(() => {
-                    connect()
-                }, backoffTime)
-            }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to connect')
-            setLoading(false)
-        }
-    }, [parsePresenceData])
-
+    /*
+     * DISCORD INTEGRATION DISABLED
+     * WebSocket connection removed to disable Lanyard integration.
+     */
     useEffect(() => {
-        connect()
+        setLoading(false)
+        setPresence({
+            isOnline: false,
+            status: 'offline'
+        })
+    }, [])
 
-        return () => {
-            // Cleanup
-            if (wsRef.current) {
-                wsRef.current.close()
-            }
-            if (heartbeatIntervalRef.current) {
-                clearInterval(heartbeatIntervalRef.current)
-            }
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current)
-            }
-        }
-    }, [connect])
+    // No-op connect function to satisfy potential callers (though internal)
+    // The original hook didn't export connect, so we just remove the logic.
 
     return { presence, loading, error }
 }
