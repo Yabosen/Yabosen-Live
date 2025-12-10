@@ -5,7 +5,7 @@ export const siteConfig = {
   // Personal Information
   name: "Yabosen",
   title: "Content Creator & Streamer",
-  bio: "lost in the void, streaming through the darkness. catch me if you can.",
+  bio: "Just Alive...",
 
   // Avatar/Profile Image
   avatarUrl: "/emo-avatar.png",
