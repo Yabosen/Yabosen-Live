@@ -1,14 +1,7 @@
 // Status API route for yabosen.live
 // Add to: app/api/status/route.ts
 
-import { Redis } from '@upstash/redis'
 import { NextResponse } from 'next/server'
-
-// Initialize Upstash Redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-})
 
 // Status types
 export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
@@ -19,14 +12,15 @@ interface StatusData {
   updatedAt: number
 }
 
-const REDIS_KEY = 'yabosen:status'
+// In-memory storage for status
+// In production with multiple serverless instances, status may be inconsistent
+// Consider using a database for persistence across instances
+let statusCache: StatusData | null = null
 
 // GET - Public: Fetch current status
 export async function GET() {
   try {
-    const data = await redis.get<StatusData>(REDIS_KEY)
-    
-    if (!data) {
+    if (!statusCache) {
       // Return default offline status if none set
       return NextResponse.json({
         status: 'offline',
@@ -34,8 +28,8 @@ export async function GET() {
         updatedAt: Date.now(),
       })
     }
-    
-    return NextResponse.json(data)
+
+    return NextResponse.json(statusCache)
   } catch (error) {
     console.error('Failed to fetch status:', error)
     return NextResponse.json(
@@ -76,10 +70,10 @@ export async function POST(request: Request) {
       customMessage: customMessage || null,
       updatedAt: Date.now(),
     }
-    
-    // Store in Redis (no expiration - status persists)
-    await redis.set(REDIS_KEY, statusData)
-    
+
+    // Store in memory
+    statusCache = statusData
+
     return NextResponse.json({ success: true, ...statusData })
   } catch (error) {
     console.error('Failed to update status:', error)
