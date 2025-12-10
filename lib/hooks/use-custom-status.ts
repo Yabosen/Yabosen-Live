@@ -27,7 +27,7 @@ export function useCustomStatus() {
 
     const fetchStatus = useCallback(async () => {
         try {
-            const response = await fetch('/api/discord-status', {
+            const response = await fetch('/api/status', {
                 cache: 'no-store',
             })
 
@@ -36,13 +36,7 @@ export function useCustomStatus() {
             }
 
             const data = await response.json()
-            // Map the simple API variables to the UI structure
-            // API: { statusText, additionalInfo, timestamp }
-            setStatusData({
-                status: (data.statusText || 'offline').toLowerCase(),
-                customMessage: data.additionalInfo || null,
-                updatedAt: data.timestamp || Date.now()
-            })
+            setStatusData(data)
             setError(null)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Unknown error')
