@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 
-export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
+export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming' | string
 
 interface StatusData {
     status: StatusType
@@ -27,7 +27,7 @@ export function useCustomStatus() {
 
     const fetchStatus = useCallback(async () => {
         try {
-            const response = await fetch('/api/status', {
+            const response = await fetch('/api/discord-status', {
                 cache: 'no-store',
             })
 
@@ -36,7 +36,13 @@ export function useCustomStatus() {
             }
 
             const data = await response.json()
-            setStatusData(data)
+            // Map the simple API variables to the UI structure
+            // API: { statusText, additionalInfo, timestamp }
+            setStatusData({
+                status: (data.statusText || 'offline').toLowerCase(),
+                customMessage: data.additionalInfo || null,
+                updatedAt: data.timestamp || Date.now()
+            })
             setError(null)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Unknown error')

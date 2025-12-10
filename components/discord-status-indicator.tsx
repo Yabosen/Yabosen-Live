@@ -33,19 +33,23 @@ export function DiscordStatusIndicator() {
         )
     }
 
+    // Handle generic status strings
+    const colorClass = statusColors[status] || "text-gray-500"
+    const displayLabel = statusLabels[status] || (status.charAt(0).toUpperCase() + status.slice(1))
+
     return (
         <div className="flex items-center gap-2 text-sm">
             <div className="relative">
                 <Circle
-                    className={`h-3 w-3 ${statusColors[status]} ${isOnline ? 'animate-pulse' : ''}`}
+                    className={`h-3 w-3 ${colorClass} ${isOnline ? 'animate-pulse' : ''}`}
                     fill="currentColor"
                 />
-                {isOnline && (
-                    <span className={`absolute inset-0 h-3 w-3 rounded-full ${statusColors[status].replace('text-', 'bg-')}/30 animate-ping`} />
+                {isOnline && statusColors[status] && (
+                    <span className={`absolute inset-0 h-3 w-3 rounded-full ${colorClass.replace('text-', 'bg-')}/30 animate-ping`} />
                 )}
             </div>
             <span className="text-muted-foreground">
-                {statusLabels[status]}
+                {displayLabel}
             </span>
             {customMessage && (
                 <span className="text-xs text-muted-foreground/70 hidden sm:inline">
