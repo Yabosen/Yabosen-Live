@@ -3,16 +3,18 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import ReactPlayer from 'react-player/youtube'
 import { useLastFmStatus } from '@/lib/hooks/use-lastfm-status'
-import { Volume2, VolumeX, Music2 } from 'lucide-react'
+import { Volume2, VolumeX, SkipForward, Music } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+const FALLBACK_VIDEO_ID = 'cKkDMiGUbUw'
+
 export function BackgroundMusicPlayer() {
-    const { track } = useLastFmStatus()
+    const { track, loading: lastFmLoading } = useLastFmStatus()
     const [playing, setPlaying] = useState(false)
     const [muted, setMuted] = useState(false)
     const [volume, setVolume] = useState(0.5)
-    // Initialize with empty, will set when searching
-    const [videoUrl, setVideoUrl] = useState<string | null>(null)
+    const [currentVideoId, setCurrentVideoId] = useState(FALLBACK_VIDEO_ID)
+    const [videoUrl, setVideoUrl] = useState(`https://www.youtube.com/watch?v=${FALLBACK_VIDEO_ID}`)
     const [userHasInteracted, setUserHasInteracted] = useState(false)
     const [isSearching, setIsSearching] = useState(false)
 
@@ -23,10 +25,8 @@ export function BackgroundMusicPlayer() {
     useEffect(() => {
         const handleInteraction = () => {
             setUserHasInteracted(true)
-            // Only auto-play if we actually have a valid URL
-            if (videoUrl) {
-                setPlaying(true)
-            }
+            setPlaying(true)
+            // Remove listeners once interaction happened
             document.removeEventListener('click', handleInteraction)
             document.removeEventListener('keydown', handleInteraction)
         }
@@ -38,7 +38,7 @@ export function BackgroundMusicPlayer() {
             document.removeEventListener('click', handleInteraction)
             document.removeEventListener('keydown', handleInteraction)
         }
-    }, [videoUrl]) // Depend on videoUrl so we start playing if interaction happened
+    }, [])
 
     const searchAndPlayTrack = useCallback(async (songName: string, artistName: string) => {
         const query = `${artistName} - ${songName}`
@@ -54,11 +54,8 @@ export function BackgroundMusicPlayer() {
             if (res.ok) {
                 const data = await res.json()
                 if (data.videoId) {
+                    setCurrentVideoId(data.videoId)
                     setVideoUrl(`https://www.youtube.com/watch?v=${data.videoId}`)
-                    // If user has already interacted, start playing immediately
-                    if (userHasInteracted) {
-                        setPlaying(true)
-                    }
                 }
             }
         } catch (err) {
@@ -66,35 +63,29 @@ export function BackgroundMusicPlayer() {
         } finally {
             setIsSearching(false)
         }
-    }, [userHasInteracted])
+    }, [])
 
     useEffect(() => {
-        // CASE 1: Not playing on Last.fm
-        if (!track?.isPlaying || !track.track) {
-            setPlaying(false)
-            setVideoUrl(null)
-            lastSearchedSongRef.current = null
+        if (!track?.isPlaying) {
+            // Revert to fallback if not playing anything
+            if (currentVideoId !== FALLBACK_VIDEO_ID) {
+                setCurrentVideoId(FALLBACK_VIDEO_ID)
+                setVideoUrl(`https://www.youtube.com/watch?v=${FALLBACK_VIDEO_ID}`)
+                lastSearchedSongRef.current = null
+            }
             return
         }
 
-        // CASE 2: Playing on Last.fm -> Search and play
-        if (track.track.name && track.track.artist) {
+        if (track.track?.name && track.track?.artist) {
             searchAndPlayTrack(track.track.name, track.track.artist)
         }
 
-    }, [track, searchAndPlayTrack])
+    }, [track, currentVideoId, searchAndPlayTrack])
 
     const toggleMute = () => setMuted(!muted)
 
-    // Don't render anything if we're not supposed to play anything (inactive)
-    // But keep it logical: if Last.fm is playing, we show the controls.
-    // If Last.fm is NOT playing, we hide controls or show 'Idle'?
-    // User wants "if nothing plays from last.fm make it play ... on repeat" -> wait, user said REMOVE that.
-    // So if nothing plays, silence.
-
-    if (!track?.isPlaying || !videoUrl) {
-        return null
-    }
+    // Only show controls if user has interacted, or maybe always show small control?
+    // User asked for background music. Let's make it subtle.
 
     return (
         <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
@@ -104,14 +95,18 @@ export function BackgroundMusicPlayer() {
                 <ReactPlayer
                     url={videoUrl}
                     playing={playing}
-                    loop={false}
+                    loop={currentVideoId === FALLBACK_VIDEO_ID} // Only loop fallback
                     controls={false}
                     volume={volume}
                     muted={muted}
                     width="0"
                     height="0"
                     onEnded={() => {
-                        // Song ended. Usually Last.fm updates before this happens repeatedly.
+                        // If it's the fallback, it loops automatically by `loop` prop.
+                        // If it's a song, we might want to replay or just stop? 
+                        // Usually songs just end. Let's loop the song too if they want, 
+                        // but usually Last.fm updates or user changes song. 
+                        // For now let's just let it stop or loop if it's fallback.
                     }}
                     onError={(e) => console.error("Player error", e)}
                 />
@@ -125,11 +120,11 @@ export function BackgroundMusicPlayer() {
                 {/* Visualizer / Status */}
                 <div className="flex flex-col max-w-[150px]">
                     <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                        NOW PLAYING
+                        {currentVideoId === FALLBACK_VIDEO_ID ? 'VIBE MODE' : 'NOW PLAYING'}
                     </span>
                     <span className="text-xs truncate text-muted-foreground">
                         {isSearching ? 'Searching...' :
-                            (track?.track ? track.track.name : 'Unknown')}
+                            (track?.isPlaying && track.track ? track.track.name : 'Vibes')}
                     </span>
                 </div>
 
@@ -159,7 +154,7 @@ export function BackgroundMusicPlayer() {
 
             {!userHasInteracted && (
                 <div className="bg-popover text-popover-foreground text-xs py-1 px-3 rounded-full shadow-md animate-bounce">
-                    Click anywhere to enable audio
+                    Click anywhere to start music
                 </div>
             )}
         </div>
