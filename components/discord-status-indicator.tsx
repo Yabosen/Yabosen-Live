@@ -1,13 +1,15 @@
 "use client"
 
 import { Circle } from "lucide-react"
-import { useDiscordPresence } from "@/lib/hooks/use-discord-presence"
+import { useCustomStatus } from "@/lib/hooks/use-custom-status"
 
 const statusColors: Record<string, string> = {
     online: "text-green-500",
     idle: "text-yellow-500",
     dnd: "text-red-500",
     offline: "text-gray-500",
+    sleeping: "text-purple-500",
+    streaming: "text-pink-500",
 }
 
 const statusLabels: Record<string, string> = {
@@ -15,10 +17,12 @@ const statusLabels: Record<string, string> = {
     idle: "Idle",
     dnd: "Do Not Disturb",
     offline: "Offline",
+    sleeping: "Sleeping",
+    streaming: "Streaming",
 }
 
 export function DiscordStatusIndicator() {
-    const { presence, loading } = useDiscordPresence()
+    const { status, customMessage, loading, isOnline } = useCustomStatus()
 
     if (loading) {
         return (
@@ -33,19 +37,19 @@ export function DiscordStatusIndicator() {
         <div className="flex items-center gap-2 text-sm">
             <div className="relative">
                 <Circle
-                    className={`h-3 w-3 ${statusColors[presence.status]} ${presence.isOnline ? 'animate-pulse' : ''}`}
+                    className={`h-3 w-3 ${statusColors[status]} ${isOnline ? 'animate-pulse' : ''}`}
                     fill="currentColor"
                 />
-                {presence.isOnline && (
-                    <span className={`absolute inset-0 h-3 w-3 rounded-full ${statusColors[presence.status].replace('text-', 'bg-')}/30 animate-ping`} />
+                {isOnline && (
+                    <span className={`absolute inset-0 h-3 w-3 rounded-full ${statusColors[status].replace('text-', 'bg-')}/30 animate-ping`} />
                 )}
             </div>
             <span className="text-muted-foreground">
-                {statusLabels[presence.status]}
+                {statusLabels[status]}
             </span>
-            {presence.activities && presence.activities.length > 0 && presence.activities[0].name && (
+            {customMessage && (
                 <span className="text-xs text-muted-foreground/70 hidden sm:inline">
-                    • {presence.activities[0].name}
+                    • {customMessage}
                 </span>
             )}
         </div>
