@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 // In-memory cache for Discord presence
-// In production, consider using Redis or a database for persistence
+// In production, consider using a database for persistence
 let presenceCache: {
   isOnline: boolean
   status: 'online' | 'offline' | 'idle' | 'dnd'
