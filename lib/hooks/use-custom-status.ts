@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 
-export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming' | string
+export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
 
 interface StatusData {
     status: StatusType

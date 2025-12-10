@@ -14,7 +14,11 @@ export async function GET() {
   try {
     const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
     const USER_ID = process.env.DISCORD_USER_ID
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> parent of 9e59bb0 (f[jaseuifhe;FIUEDGHBVDEGehgoiuerjS:HBGdefrgiulerlz.cfkbgivefrdlgv)
     if (!BOT_TOKEN || !USER_ID) {
       return NextResponse.json(
         { error: 'Discord bot token or user ID not configured' },
@@ -55,7 +59,11 @@ export async function GET() {
     // Presence requires Gateway API (WebSocket connection)
     // For this implementation, we'll check mutual guilds and try to infer status
     // Full real-time presence requires a Gateway connection (see DISCORD_SETUP.md)
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> parent of 9e59bb0 (f[jaseuifhe;FIUEDGHBVDEGehgoiuerjS:HBGdefrgiulerlz.cfkbgivefrdlgv)
     let presenceStatus: 'online' | 'offline' | 'idle' | 'dnd' = 'offline'
     let isOnline = false
 
@@ -72,7 +80,11 @@ export async function GET() {
 
       if (botGuildsResponse.ok) {
         const botGuilds = await botGuildsResponse.json()
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> parent of 9e59bb0 (f[jaseuifhe;FIUEDGHBVDEGehgoiuerjS:HBGdefrgiulerlz.cfkbgivefrdlgv)
         // Check if user is a member in any of the bot's guilds
         for (const guild of botGuilds) {
           try {
@@ -110,7 +122,11 @@ export async function GET() {
       status: presenceStatus,
       lastUpdated: Date.now(),
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> parent of 9e59bb0 (f[jaseuifhe;FIUEDGHBVDEGehgoiuerjS:HBGdefrgiulerlz.cfkbgivefrdlgv)
     return NextResponse.json({
       isOnline: isOnline,
       status: presenceStatus,
@@ -121,7 +137,11 @@ export async function GET() {
   } catch (error) {
     console.error('Error checking Discord status:', error)
     return NextResponse.json(
+<<<<<<< HEAD
       {
+=======
+      { 
+>>>>>>> parent of 9e59bb0 (f[jaseuifhe;FIUEDGHBVDEGehgoiuerjS:HBGdefrgiulerlz.cfkbgivefrdlgv)
         error: 'Failed to check Discord status',
         isOnline: false,
         status: 'offline',
@@ -130,3 +150,4 @@ export async function GET() {
     )
   }
 }
+
