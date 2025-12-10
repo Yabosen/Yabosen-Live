@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { siteConfig } from "@/lib/config"
 import { Suspense } from "react"
+import { BackgroundMusicPlayer } from "@/components/background-music-player"
 
 export const viewport: Viewport = {
   themeColor: '#7c3aed',
@@ -44,6 +45,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        <BackgroundMusicPlayer />
         <Analytics />
       </body>
     </html>
