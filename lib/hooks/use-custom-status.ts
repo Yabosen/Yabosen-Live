@@ -27,8 +27,8 @@ export function useCustomStatus() {
 
     const fetchStatus = useCallback(async () => {
         try {
-            const response = await fetch('/api/status', {
-                cache: 'no-store',
+            const response = await fetch(`/api/status?t=${Date.now()}`, {
+                cache: 'no-cache',
             })
 
             if (!response.ok) {

@@ -49,8 +49,11 @@ export async function POST(request: Request) {
     const authHeader = request.headers.get('Authorization')
     const password = authHeader?.replace('Bearer ', '')
 
+    console.log('Status Update Attempt:', { hasAuth: !!password, hasEnvPass: !!process.env.ADMIN_PASSWORD })
+
     // Check against ADMIN_PASSWORD from env
     if (!password || password !== process.env.ADMIN_PASSWORD) {
+      console.log('Status Update Failed: Invalid Password')
       return NextResponse.json(
         { error: 'Unauthorized: Invalid Password' },
         { status: 401 }
@@ -58,11 +61,19 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { status, customMessage } = body
+    console.log('Status Update Body:', body)
+
+    // Normalize input
+    let { status, customMessage, message } = body
+
+    // Handle aliases and case-insensitivity
+    if (typeof status === 'string') status = status.toLowerCase()
+    if (!customMessage && message) customMessage = message
 
     // Validate status
     const validStatuses: StatusType[] = ['online', 'offline', 'dnd', 'idle', 'sleeping', 'streaming']
     if (!validStatuses.includes(status)) {
+      console.log(`Status Update Failed: Invalid status '${status}'`)
       return NextResponse.json(
         { error: 'Invalid status. Must be one of: ' + validStatuses.join(', ') },
         { status: 400 }
@@ -71,10 +82,12 @@ export async function POST(request: Request) {
 
     // Update the static variable
     globalThis.globalStatusData = {
-      status,
+      status: status as StatusType,
       customMessage: customMessage || null,
       updatedAt: Date.now(),
     }
+
+    console.log('Status Updated Successfully:', globalThis.globalStatusData)
 
     return NextResponse.json({ success: true, ...globalThis.globalStatusData })
   } catch (error) {
