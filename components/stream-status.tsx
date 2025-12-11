@@ -4,15 +4,11 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Circle } from "lucide-react"
 import { siteConfig } from "@/lib/config"
-import { useDiscordStatus } from "@/lib/hooks/use-discord-status"
+import { useCustomStatus } from "@/lib/hooks/use-custom-status"
 
 export function StreamStatus() {
   const { streamStatus } = siteConfig
-  const { status: discordStatus, loading } = useDiscordStatus()
-
-  // Use real Discord status if available, fallback to config
-  const isOnline = discordStatus.isOnline || false
-  const status = discordStatus.status || 'offline'
+  const { status, customMessage, isOnline } = useCustomStatus()
 
   // Only show if online
   if (!isOnline) {
@@ -26,18 +22,22 @@ export function StreamStatus() {
     "bottom-left": "bottom-4 left-4",
   }
 
-  const statusColors = {
-    online: "bg-green-500",
-    idle: "bg-yellow-500",
-    dnd: "bg-red-500",
-    offline: "bg-gray-500",
+  const statusColors: Record<string, string> = {
+    online: "text-green-500",
+    idle: "text-yellow-500",
+    dnd: "text-red-500",
+    offline: "text-gray-500",
+    sleeping: "text-purple-500",
+    streaming: "text-pink-500",
   }
 
-  const statusLabels = {
+  const statusLabels: Record<string, string> = {
     online: "ONLINE",
     idle: "IDLE",
     dnd: "DO NOT DISTURB",
     offline: "OFFLINE",
+    sleeping: "SLEEPING",
+    streaming: "STREAMING",
   }
 
   return (
@@ -57,11 +57,12 @@ export function StreamStatus() {
             <Badge variant="destructive" className="w-fit bg-primary hover:bg-primary text-primary-foreground">
               {statusLabels[status]}
             </Badge>
-            <p className="text-sm font-medium text-foreground">Discord Status</p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>on Discord</span>
-              {discordStatus.username && <span>• {discordStatus.username}</span>}
-            </div>
+            <p className="text-sm font-medium text-foreground">Current Status</p>
+            {customMessage && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{customMessage}</span>
+              </div>
+            )}
           </div>
         </div>
       </Card>

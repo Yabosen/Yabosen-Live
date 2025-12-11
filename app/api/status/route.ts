@@ -1,41 +1,31 @@
 // Status API route for yabosen.live
+// Uses simple in-memory storage (serverless compatible, non-persistent)
 // Add to: app/api/status/route.ts
 
-import { Redis } from '@upstash/redis'
 import { NextResponse } from 'next/server'
-
-// Initialize Upstash Redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-})
 
 // Status types
 export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
 
 interface StatusData {
   status: StatusType
-  customMessage?: string
+  customMessage: string | null
   updatedAt: number
 }
 
-const REDIS_KEY = 'yabosen:status'
+// Global in-memory storage (variables should be static logic)
+// Note: This will reset when the serverless function cold-starts/reDeploys
+// This serves the "suffer from vercel" requirement (no Redis)
+let globalStatusData: StatusData = {
+  status: 'offline',
+  customMessage: null,
+  updatedAt: Date.now(),
+}
 
 // GET - Public: Fetch current status
 export async function GET() {
   try {
-    const data = await redis.get<StatusData>(REDIS_KEY)
-
-    if (!data) {
-      // Return default offline status if none set
-      return NextResponse.json({
-        status: 'offline',
-        customMessage: null,
-        updatedAt: Date.now(),
-      })
-    }
-
-    return NextResponse.json(data)
+    return NextResponse.json(globalStatusData)
   } catch (error) {
     console.error('Failed to fetch status:', error)
     return NextResponse.json(
@@ -72,16 +62,14 @@ export async function POST(request: Request) {
       )
     }
 
-    const statusData: StatusData = {
+    // Update the static variable
+    globalStatusData = {
       status,
       customMessage: customMessage || null,
       updatedAt: Date.now(),
     }
 
-    // Store in Redis (no expiration - status persists)
-    await redis.set(REDIS_KEY, statusData)
-
-    return NextResponse.json({ success: true, ...statusData })
+    return NextResponse.json({ success: true, ...globalStatusData })
   } catch (error) {
     console.error('Failed to update status:', error)
     return NextResponse.json(

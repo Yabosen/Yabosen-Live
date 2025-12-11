@@ -4,42 +4,46 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Circle } from "lucide-react"
 import { siteConfig } from "@/lib/config"
-import { useDiscordStatus } from "@/lib/hooks/use-discord-status"
+import { useCustomStatus } from "@/lib/hooks/use-custom-status"
 
 export function MultiStreamStatus() {
-  const { status: discordStatus } = useDiscordStatus()
-  
-  // Update the platforms with real Discord data
+  const { status, customMessage, isOnline } = useCustomStatus()
+
+  // Update the platforms with real status data
   const platforms = siteConfig.multiStreamStatus.platforms.map(platform => {
     if (platform.platform === "Discord") {
       return {
         ...platform,
-        isLive: discordStatus.isOnline,
-        title: discordStatus.status ? `Status: ${discordStatus.status.toUpperCase()}` : platform.title,
-        viewers: discordStatus.username || "",
+        isLive: isOnline,
+        title: status ? `Status: ${status.toUpperCase()}` : platform.title,
+        viewers: customMessage || "",
       }
     }
     return platform
   })
-  
+
   const activeStreams = platforms.filter((p) => p.isLive)
 
   if (activeStreams.length === 0) {
     return null
   }
 
-  const statusColors = {
-    online: "bg-green-500",
-    idle: "bg-yellow-500",
-    dnd: "bg-red-500",
-    offline: "bg-gray-500",
+  const statusColors: Record<string, string> = {
+    online: "text-green-500",
+    idle: "text-yellow-500",
+    dnd: "text-red-500",
+    offline: "text-gray-500",
+    sleeping: "text-purple-500",
+    streaming: "text-pink-500",
   }
 
-  const statusLabels = {
+  const statusLabels: Record<string, string> = {
     online: "ONLINE",
     idle: "IDLE",
     dnd: "DO NOT DISTURB",
     offline: "OFFLINE",
+    sleeping: "SLEEPING",
+    streaming: "STREAMING",
   }
 
   return (
@@ -49,8 +53,8 @@ export function MultiStreamStatus() {
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
             <div className="relative">
-              <Circle className={`h-6 w-6 ${statusColors[discordStatus.status || 'offline']} animate-pulse`} fill="currentColor" />
-              <span className={`absolute inset-0 h-6 w-6 rounded-full ${statusColors[discordStatus.status || 'offline']}/30 animate-ping`} />
+              <Circle className={`h-6 w-6 ${statusColors[status] || 'text-gray-500'} animate-pulse`} fill="currentColor" />
+              <span className={`absolute inset-0 h-6 w-6 rounded-full ${statusColors[status]?.replace('text-', 'bg-') || 'bg-gray-500'}/30 animate-ping`} />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground">Discord Status</h3>
@@ -70,7 +74,7 @@ export function MultiStreamStatus() {
               >
                 <div className="flex items-center gap-3">
                   <Badge variant="destructive" className="bg-primary hover:bg-primary text-primary-foreground">
-                    {statusLabels[discordStatus.status || 'offline']}
+                    {statusLabels[status] || 'OFFLINE'}
                   </Badge>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
@@ -79,7 +83,7 @@ export function MultiStreamStatus() {
                     <p className="text-sm text-muted-foreground truncate">{stream.title}</p>
                   </div>
                 </div>
-                {discordStatus.username && <p className="text-xs text-muted-foreground mt-2">@{discordStatus.username}</p>}
+                {customMessage && <p className="text-xs text-muted-foreground mt-2">{customMessage}</p>}
               </a>
             ))}
           </div>

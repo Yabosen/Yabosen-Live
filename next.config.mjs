@@ -9,6 +9,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/discord-status',
+        destination: '/api/status',
+      },
+    ]
+  },
 }
 
 export default nextConfig
