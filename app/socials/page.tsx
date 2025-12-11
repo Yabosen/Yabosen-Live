@@ -1,15 +1,15 @@
-```
+
 import { siteConfig } from "@/lib/config"
 import { AnimatedAvatar } from "@/components/animated-avatar"
-import { 
-  Twitch, 
-  Youtube, 
-  Radio, 
-  Music, 
-  PlayCircle, 
-  Twitter, 
-  Send, 
-  Disc3, 
+import {
+  Twitch,
+  Youtube,
+  Radio,
+  Music,
+  PlayCircle,
+  Twitter,
+  Send,
+  Disc3,
   Gamepad2,
   ExternalLink
 } from "lucide-react"
@@ -48,7 +48,7 @@ function SocialLink({ name, url, icon }: SocialLinkProps) {
 
 export default function SocialsPage() {
   return (
-    <main 
+    <main
       className="min-h-screen flex flex-col items-center py-12 px-4 relative overflow-y-auto w-full"
       style={{
         backgroundImage: "url('/socials-bg.png')",
@@ -131,4 +131,4 @@ export default function SocialsPage() {
     </main>
   )
 }
-```
+
