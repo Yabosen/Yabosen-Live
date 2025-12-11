@@ -105,7 +105,7 @@ export default function SocialsPage() {
           />
           <SocialLink
             name="YT Music"
-            url="https://music.youtube.com/channel/UCjCPjfkiQF16MSoL8QQyW8A"
+            url="https://music.youtube.com/channel/UCyH01t7DHZKPnKAY-4JVNSA"
             icon={<PlayCircle className="h-6 w-6" />}
           />
           <SocialLink
