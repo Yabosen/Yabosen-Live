@@ -28,12 +28,12 @@ function SocialLink({ name, url, icon }: SocialLinkProps) {
       rel="noopener noreferrer"
       className="
         group w-full max-w-lg flex items-center justify-between
-        bg-[#0a0a0a] border border-white/5
+        bg-white/5 backdrop-blur-md border border-white/10
         px-6 py-4 rounded-full
         transition-all duration-300 ease-out
-        hover:scale-[1.02] hover:bg-[#111] hover:border-white/10
+        hover:scale-[1.02] hover:bg-white/10 hover:border-white/20
         active:scale-[0.98]
-        hover:shadow-lg hover:shadow-purple-900/10
+        hover:shadow-lg hover:shadow-purple-900/20
       "
     >
       <span className="font-medium text-zinc-100 text-lg group-hover:text-purple-300 transition-colors">
@@ -64,11 +64,13 @@ export default function SocialsPage() {
       <div className="z-10 w-full flex flex-col items-center space-y-8 max-w-xl mx-auto pb-12">
         {/* Avatar & Header */}
         <div className="flex flex-col items-center text-center space-y-4 pt-4">
-          <AnimatedAvatar
-            src="/emo-avatar.png"
-            alt={siteConfig.name}
-            size={120}
-          />
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-full p-2">
+            <AnimatedAvatar
+              src="/emo-avatar.png"
+              alt={siteConfig.name}
+              size={120}
+            />
+          </div>
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-white drop-shadow-md tracking-wide">
               {siteConfig.name}
