@@ -13,19 +13,26 @@ interface StatusData {
   updatedAt: number
 }
 
-// Global in-memory storage (variables should be static logic)
-// Note: This will reset when the serverless function cold-starts/reDeploys
-// This serves the "suffer from vercel" requirement (no Redis)
-let globalStatusData: StatusData = {
-  status: 'offline',
-  customMessage: null,
-  updatedAt: Date.now(),
+// Global in-memory storage using globalThis to survive hot-reloads in dev
+// Note: This still resets on server restart/deployment
+declare global {
+  var globalStatusData: StatusData | undefined
 }
+
+if (!globalThis.globalStatusData) {
+  globalThis.globalStatusData = {
+    status: 'offline',
+    customMessage: null,
+    updatedAt: Date.now(),
+  }
+}
+
+export const dynamic = 'force-dynamic'
 
 // GET - Public: Fetch current status
 export async function GET() {
   try {
-    return NextResponse.json(globalStatusData)
+    return NextResponse.json(globalThis.globalStatusData)
   } catch (error) {
     console.error('Failed to fetch status:', error)
     return NextResponse.json(
@@ -63,13 +70,13 @@ export async function POST(request: Request) {
     }
 
     // Update the static variable
-    globalStatusData = {
+    globalThis.globalStatusData = {
       status,
       customMessage: customMessage || null,
       updatedAt: Date.now(),
     }
 
-    return NextResponse.json({ success: true, ...globalStatusData })
+    return NextResponse.json({ success: true, ...globalThis.globalStatusData })
   } catch (error) {
     console.error('Failed to update status:', error)
     return NextResponse.json(
