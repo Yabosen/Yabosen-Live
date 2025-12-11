@@ -1,4 +1,4 @@
-
+// Socials page implementation
 import { siteConfig } from "@/lib/config"
 import { AnimatedAvatar } from "@/components/animated-avatar"
 import {
