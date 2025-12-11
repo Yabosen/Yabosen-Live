@@ -97,7 +97,7 @@ export default function Home() {
           </div>
 
           {/* Link to full socials page */}
-          <div className="mt-12 text-center">
+          <div className="mt-12 text-center space-y-3">
             <a
               href="/yabo"
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
@@ -105,6 +105,14 @@ export default function Home() {
               <LinkIcon className="h-4 w-4 group-hover:scale-110 transition-transform" />
               View all links & socials
             </a>
+            <div>
+              <a
+                href="/socials"
+                className="inline-flex items-center justify-center px-6 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/40 rounded-full text-sm font-medium text-primary transition-all hover:scale-105 active:scale-95"
+              >
+                View Full Socials Page
+              </a>
+            </div>
           </div>
 
           {/* Footer */}
