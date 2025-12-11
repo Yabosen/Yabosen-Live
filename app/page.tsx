@@ -1,7 +1,7 @@
 import { siteConfig } from "@/lib/config"
 import { AnimatedAvatar } from "@/components/animated-avatar"
 import { LinkCard } from "@/components/link-card"
-import { DiscordStatusIndicator } from "@/components/discord-status-indicator"
+import { StatusIndicator } from "@/components/status-indicator"
 import { LastFmWidget } from "@/components/lastfm-widget"
 import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
 import { HiddenCredits } from "@/components/hidden-credits"
@@ -40,7 +40,7 @@ export default function Home() {
               <p className="text-muted-foreground text-sm sm:text-base mb-3 max-w-md">
                 {siteConfig.bio}
               </p>
-              <DiscordStatusIndicator />
+              <StatusIndicator />
             </div>
           </div>
 
