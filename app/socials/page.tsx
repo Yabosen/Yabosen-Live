@@ -115,7 +115,7 @@ export default function SocialsPage() {
           />
           <SocialLink
             name="Telegram"
-            url="https://t.me/yabosen"
+            url="https://t.me/Yabosenchan"
             icon={<Send className="h-6 w-6" />}
           />
           <SocialLink
@@ -128,6 +128,26 @@ export default function SocialsPage() {
             url="https://steamcommunity.com/id/Yabosen/"
             icon={<Gamepad2 className="h-6 w-6" />}
           />
+        </div>
+
+        {/* Back to Home button */}
+        <div className="w-full flex justify-center mt-8">
+          <a
+            href="/"
+            className="
+              group flex items-center justify-center
+              bg-white/5 backdrop-blur-md border border-white/10
+              px-8 py-3 rounded-full
+              transition-all duration-300 ease-out
+              hover:scale-[1.02] hover:bg-white/10 hover:border-white/20
+              active:scale-[0.98]
+              hover:shadow-lg hover:shadow-purple-900/20
+            "
+          >
+            <span className="font-medium text-zinc-100 text-base group-hover:text-purple-300 transition-colors">
+              Back to Home
+            </span>
+          </a>
         </div>
       </div>
     </main>
