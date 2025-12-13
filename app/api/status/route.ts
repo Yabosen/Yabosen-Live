@@ -83,11 +83,21 @@ export async function GET() {
 // POST - Protected: Update status (requires API key)
 export async function POST(request: Request) {
   try {
+    console.log('=== STATUS UPDATE REQUEST ===')
+
     // Verify API Key
     const authHeader = request.headers.get('Authorization')
     const apiKey = authHeader?.replace('Bearer ', '')
 
+    console.log('Auth check:', {
+      hasAuthHeader: !!authHeader,
+      hasApiKey: !!apiKey,
+      hasEnvKey: !!process.env.STATUS_API_KEY,
+      keysMatch: apiKey === process.env.STATUS_API_KEY
+    })
+
     if (!apiKey || apiKey !== process.env.STATUS_API_KEY) {
+      console.log('❌ Auth failed')
       return NextResponse.json(
         { error: 'Unauthorized: Invalid API Key' },
         { status: 401 }
@@ -95,6 +105,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
+    console.log('Request body:', body)
 
     // Normalize input
     let { status, customMessage, message } = body
@@ -106,6 +117,7 @@ export async function POST(request: Request) {
     // Validate status
     const validStatuses: StatusType[] = ['online', 'offline', 'dnd', 'idle', 'sleeping', 'streaming']
     if (!validStatuses.includes(status)) {
+      console.log(`❌ Invalid status: ${status}`)
       return NextResponse.json(
         { error: 'Invalid status. Must be one of: ' + validStatuses.join(', ') },
         { status: 400 }
@@ -119,13 +131,15 @@ export async function POST(request: Request) {
       updatedAt: Date.now(),
     }
 
+    console.log('Writing to Redis:', newStatus)
     await writeStatus(newStatus)
+    console.log('✅ Status updated successfully')
 
     return NextResponse.json({ success: true, ...newStatus })
   } catch (error) {
-    console.error('Failed to update status:', error)
+    console.error('❌ Failed to update status:', error)
     return NextResponse.json(
-      { error: 'Failed to update status' },
+      { error: 'Failed to update status', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
