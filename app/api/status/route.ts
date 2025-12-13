@@ -1,12 +1,6 @@
-// Status API route for yabosen.live
-// Uses filesystem storage for persistence
-// Add to: app/api/status/route.ts
-
 import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { Redis } from '@upstash/redis'
 
-// Status types
 export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
 
 interface StatusData {
@@ -15,44 +9,59 @@ interface StatusData {
   updatedAt: number
 }
 
-const STATUS_FILE = path.join(process.cwd(), 'data', 'status.json')
+const REDIS_KEY = 'yabosen:status'
 
-// Ensure data directory exists
-async function ensureDataDir() {
-  try {
-    await fs.mkdir(path.dirname(STATUS_FILE), { recursive: true })
-  } catch (error) {
-    // Directory already exists or can't be created
+// Initialize Redis client
+function getRedisClient() {
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+
+  if (!url || !token) {
+    throw new Error('Redis configuration missing. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN')
   }
+
+  return new Redis({
+    url,
+    token,
+  })
 }
 
-// Read status from file
+// Read status from Redis
 async function readStatus(): Promise<StatusData> {
   try {
-    await ensureDataDir()
-    const data = await fs.readFile(STATUS_FILE, 'utf-8')
-    return JSON.parse(data)
-  } catch (error) {
-    // File doesn't exist or is invalid, return default
+    const redis = getRedisClient()
+    const data = await redis.get<StatusData>(REDIS_KEY)
+
+    if (data) {
+      return data
+    }
+
+    // Return default if no data exists
     const defaultStatus: StatusData = {
-      status: 'online',
+      status: 'offline',
       customMessage: null,
       updatedAt: Date.now(),
     }
-    // Try to save default
-    try {
-      await fs.writeFile(STATUS_FILE, JSON.stringify(defaultStatus, null, 2))
-    } catch (writeError) {
-      // Ignore write errors
-    }
+
+    // Save default to Redis
+    await redis.set(REDIS_KEY, defaultStatus)
+
     return defaultStatus
+  } catch (error) {
+    console.error('Redis read error:', error)
+    // Fallback to offline status if Redis fails
+    return {
+      status: 'offline',
+      customMessage: null,
+      updatedAt: Date.now(),
+    }
   }
 }
 
-// Write status to file
+// Write status to Redis
 async function writeStatus(data: StatusData): Promise<void> {
-  await ensureDataDir()
-  await fs.writeFile(STATUS_FILE, JSON.stringify(data, null, 2))
+  const redis = getRedisClient()
+  await redis.set(REDIS_KEY, data)
 }
 
 export const dynamic = 'force-dynamic'
@@ -74,23 +83,18 @@ export async function GET() {
 // POST - Protected: Update status (requires API key)
 export async function POST(request: Request) {
   try {
-    // Verify Password
+    // Verify API Key
     const authHeader = request.headers.get('Authorization')
-    const password = authHeader?.replace('Bearer ', '')
+    const apiKey = authHeader?.replace('Bearer ', '')
 
-    console.log('Status Update Attempt:', { hasAuth: !!password, hasEnvPass: !!process.env.ADMIN_PASSWORD })
-
-    // Check against ADMIN_PASSWORD from env
-    if (!password || password !== process.env.ADMIN_PASSWORD) {
-      console.log('Status Update Failed: Invalid Password')
+    if (!apiKey || apiKey !== process.env.STATUS_API_KEY) {
       return NextResponse.json(
-        { error: 'Unauthorized: Invalid Password' },
+        { error: 'Unauthorized: Invalid API Key' },
         { status: 401 }
       )
     }
 
     const body = await request.json()
-    console.log('Status Update Body:', body)
 
     // Normalize input
     let { status, customMessage, message } = body
@@ -102,7 +106,6 @@ export async function POST(request: Request) {
     // Validate status
     const validStatuses: StatusType[] = ['online', 'offline', 'dnd', 'idle', 'sleeping', 'streaming']
     if (!validStatuses.includes(status)) {
-      console.log(`Status Update Failed: Invalid status '${status}'`)
       return NextResponse.json(
         { error: 'Invalid status. Must be one of: ' + validStatuses.join(', ') },
         { status: 400 }
@@ -117,8 +120,6 @@ export async function POST(request: Request) {
     }
 
     await writeStatus(newStatus)
-
-    console.log('Status Updated Successfully:', newStatus)
 
     return NextResponse.json({ success: true, ...newStatus })
   } catch (error) {
