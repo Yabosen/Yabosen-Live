@@ -16,6 +16,12 @@ function getRedisClient() {
   const url = process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN
 
+  console.log('Redis config check:', {
+    hasUrl: !!url,
+    hasToken: !!token,
+    urlPrefix: url?.substring(0, 20)
+  })
+
   if (!url || !token) {
     throw new Error('Redis configuration missing. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN')
   }
@@ -60,8 +66,15 @@ async function readStatus(): Promise<StatusData> {
 
 // Write status to Redis
 async function writeStatus(data: StatusData): Promise<void> {
-  const redis = getRedisClient()
-  await redis.set(REDIS_KEY, data)
+  try {
+    const redis = getRedisClient()
+    console.log('Attempting to write to Redis:', { key: REDIS_KEY, data })
+    const result = await redis.set(REDIS_KEY, data)
+    console.log('Redis write result:', result)
+  } catch (error) {
+    console.error('Redis write error details:', error)
+    throw error
+  }
 }
 
 export const dynamic = 'force-dynamic'
