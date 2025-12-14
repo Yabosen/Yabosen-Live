@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>YabosenStatus</name>
+    </assembly>
+    <members>
+        <member name="T:YabosenStatus.Models.StatusType">
+            <summary>
+            Represents the possible status types for the user
+            </summary>
+        </member>
+        <member name="T:YabosenStatus.Models.ActivityType">
+            <summary>
+            Activity type for the user's current activity
+            </summary>
+        </member>
+        <member name="T:YabosenStatus.Models.StatusData">
+            <summary>
+            Status data model matching the API response
+            </summary>
+        </member>
+        <member name="T:YabosenStatus.Models.StatusResponse">
+            <summary>
+            API response wrapper for status updates
+            </summary>
+        </member>
+        <member name="T:YabosenStatus.Models.StatusTypeExtensions">
+            <summary>
+            Extension methods for StatusType
+            </summary>
+        </member>
+        <member name="T:YabosenStatus.Models.ActivityTypeExtensions">
+            <summary>
+            Extension methods for ActivityType
+            </summary>
+        </member>
+        <member name="T:YabosenStatus.Services.StatusService">
+            <summary>
+            Service for communicating with the Yabosen status API
+            </summary>
+        </member>
+        <member name="M:YabosenStatus.Services.StatusService.InitializeAsync">
+            <summary>
+            Initialize the service by loading the stored password
+            </summary>
+        </member>
+        <member name="P:YabosenStatus.Services.StatusService.HasPassword">
+            <summary>
+            Check if password is configured
+            </summary>
+        </member>
+        <member name="M:YabosenStatus.Services.StatusService.SetPasswordAsync(System.String)">
+            <summary>
+            Save the password securely
+            </summary>
+        </member>
+        <member name="M:YabosenStatus.Services.StatusService.GetPasswordPreview">
+            <summary>
+            Get the current password (masked for display)
+            </summary>
+        </member>
+        <member name="M:YabosenStatus.Services.StatusService.GetStatusAsync">
+            <summary>
+            Fetch the current status from the API
+            </summary>
+        </member>
+        <member name="M:YabosenStatus.Services.StatusService.UpdateStatusAsync(YabosenStatus.Models.StatusType,System.String,YabosenStatus.Models.ActivityType,System.String,System.String,System.String)">
+            <summary>
+            Update the status via the API
+            </summary>
+        </member>
+        <member name="M:YabosenStatus.Services.StatusService.ClearPassword">
+            <summary>
+            Clear the stored password
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,4 @@
+C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\bin\Release\net8.0-android\publish\com.yabosen.status-Signed.aab
+C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\bin\Release\net8.0-android\publish\com.yabosen.status.aab
+C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\bin\Release\net8.0-android\publish\com.yabosen.status-Signed.apk
+C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\bin\Release\net8.0-android\publish\_Microsoft.Android.Resource.Designer.dll
