@@ -6,6 +6,10 @@ import { StatusType } from "@/lib/hooks/use-custom-status"
 interface DiscordStatusIndicatorProps {
     status: StatusType
     customMessage: string | null
+    activityType: 'playing' | 'watching' | null
+    activityName: string | null
+    episodeInfo: string | null
+    seasonInfo: string | null
     loading: boolean
     isOnline: boolean
 }
@@ -19,7 +23,16 @@ const statusColors: Record<StatusType, { color: string; label: string; icon?: 'm
     streaming: { color: "text-pink-500", label: "Streaming", icon: 'video' },
 }
 
-export function DiscordStatusIndicator({ status, customMessage, loading, isOnline }: DiscordStatusIndicatorProps) {
+export function DiscordStatusIndicator({
+    status,
+    customMessage,
+    activityType,
+    activityName,
+    episodeInfo,
+    seasonInfo,
+    loading,
+    isOnline
+}: DiscordStatusIndicatorProps) {
     if (loading) {
         return (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -48,6 +61,34 @@ export function DiscordStatusIndicator({ status, customMessage, loading, isOnlin
         )
     }
 
+    // Format activity text
+    const getActivityText = () => {
+        if (!activityType || !activityName) return null
+
+        if (activityType === 'playing') {
+            return `Playing: ${activityName}`
+        }
+
+        if (activityType === 'watching') {
+            let text = `Watching: ${activityName}`
+            const extras: string[] = []
+
+            if (seasonInfo) extras.push(seasonInfo)
+            if (episodeInfo) extras.push(`Ep ${episodeInfo}`)
+
+            if (extras.length > 0) {
+                text += ` (${extras.join(' ')})`
+            }
+
+            return text
+        }
+
+        return null
+    }
+
+    const activityText = getActivityText()
+    const displayText = activityText || customMessage || config.label
+
     return (
         <div className="flex items-center gap-2 text-sm">
             <div className="relative">
@@ -58,14 +99,28 @@ export function DiscordStatusIndicator({ status, customMessage, loading, isOnlin
                     />
                 )}
             </div>
-            <span className="text-muted-foreground">
-                {config.label}
+
+            {/* Main Status Text */}
+            <span className="text-muted-foreground font-medium">
+                {displayText}
             </span>
-            {customMessage && (
-                <span className="text-xs text-muted-foreground/70 hidden sm:inline">
-                    • {customMessage}
+
+            {/* Secondary Text (if we showed activity, show custom message or label as secondary if needed, but keeping it simple for now) */}
+            {/* If we are showing activity text, we might want to also show the base status label in tooltip or small text, but user didn't request that. 
+                However, if we are Showing Custom Message, we usually replace the label.
+                Here, let's prioritize Activity > CustomMessage > Status Label.
+            */}
+
+            {/* If we have an activity AND a custom message, maybe show custom message as secondary? */}
+            {(activityText && customMessage) && (
+                <span className="text-xs text-muted-foreground/70 hidden sm:inline border-l border-border/50 pl-2">
+                    {customMessage}
                 </span>
             )}
+
+            {/* If we have NO activity but a custom message, we showed it in displayText. 
+                 If we used the default label, we showed it in displayText. 
+             */}
         </div>
     )
 }
