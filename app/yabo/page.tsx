@@ -1,6 +1,5 @@
 import { siteConfig } from "@/lib/config"
 import { SocialLinkButton } from "@/components/social-link-button"
-import { MultiStreamStatus } from "@/components/multi-stream-status"
 import { TopNav } from "@/components/top-nav"
 import { PersonalInfo } from "@/components/personal-info"
 import { CSStats } from "@/components/cs-stats"
@@ -68,11 +67,6 @@ export default function YaboPage() {
                 variant="icon"
               />
             ))}
-          </div>
-
-          {/* Multi-platform Stream Status Section */}
-          <div className="mt-12">
-            <MultiStreamStatus />
           </div>
 
           {/* Footer */}

@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server'
 import { Redis } from '@upstash/redis'
 
 export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
+export type ActivityType = 'playing' | 'watching' | null
 
 interface StatusData {
   status: StatusType
   customMessage: string | null
+  activityType: ActivityType
+  activityName: string | null
+  episodeInfo: string | null
+  seasonInfo: string | null
   updatedAt: number
 }
 
@@ -46,6 +51,10 @@ async function readStatus(): Promise<StatusData> {
     const defaultStatus: StatusData = {
       status: 'offline',
       customMessage: null,
+      activityType: null,
+      activityName: null,
+      episodeInfo: null,
+      seasonInfo: null,
       updatedAt: Date.now(),
     }
 
@@ -59,6 +68,10 @@ async function readStatus(): Promise<StatusData> {
     return {
       status: 'offline',
       customMessage: null,
+      activityType: null,
+      activityName: null,
+      episodeInfo: null,
+      seasonInfo: null,
       updatedAt: Date.now(),
     }
   }
@@ -121,11 +134,12 @@ export async function POST(request: Request) {
     console.log('Request body:', body)
 
     // Normalize input
-    let { status, customMessage, message } = body
+    let { status, customMessage, message, activityType, activityName, episodeInfo, seasonInfo } = body
 
     // Handle aliases and case-insensitivity
     if (typeof status === 'string') status = status.toLowerCase()
     if (!customMessage && message) customMessage = message
+    if (typeof activityType === 'string') activityType = activityType.toLowerCase()
 
     // Validate status
     const validStatuses: StatusType[] = ['online', 'offline', 'dnd', 'idle', 'sleeping', 'streaming']
@@ -137,10 +151,23 @@ export async function POST(request: Request) {
       )
     }
 
+    // Validate activity type if provided
+    if (activityType && activityType !== 'playing' && activityType !== 'watching') {
+      console.log(`❌ Invalid activity type: ${activityType}`)
+      return NextResponse.json(
+        { error: 'Invalid activity type. Must be "playing" or "watching"' },
+        { status: 400 }
+      )
+    }
+
     // Update and persist status
     const newStatus: StatusData = {
       status: status as StatusType,
       customMessage: customMessage || null,
+      activityType: activityType || null,
+      activityName: activityName || null,
+      episodeInfo: episodeInfo || null,
+      seasonInfo: seasonInfo || null,
       updatedAt: Date.now(),
     }
 

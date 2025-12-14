@@ -10,6 +10,10 @@ export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 's
 interface StatusData {
     status: StatusType
     customMessage: string | null
+    activityType: 'playing' | 'watching' | null
+    activityName: string | null
+    episodeInfo: string | null
+    seasonInfo: string | null
     updatedAt: number
 }
 
@@ -19,6 +23,10 @@ export function useCustomStatus() {
     const [statusData, setStatusData] = useState<StatusData>({
         status: 'offline',
         customMessage: null,
+        activityType: null,
+        activityName: null,
+        episodeInfo: null,
+        seasonInfo: null,
         updatedAt: Date.now(),
     })
     const [loading, setLoading] = useState(true)
@@ -62,6 +70,10 @@ export function useCustomStatus() {
     return {
         status: statusData.status,
         customMessage: statusData.customMessage,
+        activityType: statusData.activityType,
+        activityName: statusData.activityName,
+        episodeInfo: statusData.episodeInfo,
+        seasonInfo: statusData.seasonInfo,
         updatedAt: statusData.updatedAt,
         loading,
         error,
