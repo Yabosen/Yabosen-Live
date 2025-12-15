@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="108" height="108" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#ffffff" d="M54,30L54,54L74,54M54,54L40,70"/>
+    <!-- Conservative path-data format for Resizetizer/SVG parsers -->
+    <path fill="#ffffff" d="M 54 30 L 54 54 L 74 54 M 54 54 L 40 70" />
 </svg>

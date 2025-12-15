@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YabosenStatus")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+d75b94c9a30f3eae102bc0ee87552cde7fce633f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+35a5dc31f3842c7634d6ee3712de9f977bc689b3")]
 [assembly: System.Reflection.AssemblyProductAttribute("YabosenStatus")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YabosenStatus")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

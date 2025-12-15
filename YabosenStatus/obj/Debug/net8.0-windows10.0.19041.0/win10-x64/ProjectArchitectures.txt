@@ -1,1 +1,0 @@
-C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus\YabosenStatus.csproj;x64

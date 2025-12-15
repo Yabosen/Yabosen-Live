@@ -4,4 +4,5 @@ node_modules
 .env*.local
 
 # Ignored Folders
-
+/website-backend
+/YabosenStatus
