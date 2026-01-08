@@ -282,6 +282,48 @@
                                Color="#a855f7"
                                HorizontalOptions="Center"/>
 
+             <!-- Auto-Sleep Settings -->
+             <Frame BackgroundColor="#1a1a1a"
+                    BorderColor="#333333"
+                    CornerRadius="12"
+                    Padding="16"
+                    HasShadow="False"
+                    Margin="0,16,0,0">
+                 <VerticalStackLayout Spacing="12">
+                     <Label Text="Auto-Sleep Check"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            TextColor="White"/>
+                     <Label Text="Sends a notification to check if you're sleeping. If no response in 5 mins, status sets to Sleeping."
+                            FontSize="12"
+                            TextColor="#9ca3af"/>
+                     
+                     <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                         <Label Text="Enable" 
+                                TextColor="White" 
+                                VerticalOptions="Center"/>
+                         <Switch x:Name="AutoSleepSwitch" 
+                                 OnColor="#a855f7" 
+                                 ThumbColor="White"/>
+                     </HorizontalStackLayout>
+                     
+                     <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                         <Label Text="Check Time" 
+                                TextColor="White" 
+                                VerticalOptions="Center"/>
+                         <TimePicker x:Name="AutoSleepTimePicker"
+                                     TextColor="White"
+                                     BackgroundColor="#262626"/>
+                     </HorizontalStackLayout>
+                     
+                     <Button Text="Save Settings"
+                             BackgroundColor="#374151"
+                             TextColor="White"
+                             CornerRadius="8"
+                             Clicked="OnSaveAutoSleepSettings"/>
+                 </VerticalStackLayout>
+             </Frame>
+
             <!-- Footer -->
             <Label Text="yabosen.live • Android"
                    FontSize="12"

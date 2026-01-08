@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YabosenStatus.Windows")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+63fafd9fa4e824a7f223fd8ab32df686be98acd1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+6698fa86780390cbe2f58ef42c7e05dd4369a99a")]
 [assembly: System.Reflection.AssemblyProductAttribute("YabosenStatus.Windows")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YabosenStatus.Windows")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

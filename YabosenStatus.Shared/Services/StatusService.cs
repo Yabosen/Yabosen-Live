@@ -141,7 +141,8 @@ public class StatusService
                 activityType = activityType != ActivityType.None ? activityType.ToApiString() : null,
                 activityName = activityName,
                 episodeInfo = episodeInfo,
-                seasonInfo = seasonInfo
+                seasonInfo = seasonInfo,
+                platform = "windows" // Hardcoded for Windows client for now, could be dynamic
             };
 
             request.Content = JsonContent.Create(payload, options: JsonOptions);

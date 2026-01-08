@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Logging;
-using YabosenStatus.Shared.Services;
+using Plugin.LocalNotification;
+using YabosenStatus.Android.Services;
 
 namespace YabosenStatus.Android;
 
@@ -11,10 +11,13 @@ public static class MauiProgram
         {
             var builder = MauiApp.CreateBuilder();
             builder
-                .UseMauiApp<App>();
+                .UseMauiApp<App>()
+                .UseLocalNotification(); // Init plugin
 
             // Register services
             builder.Services.AddSingleton<StatusService>();
+            builder.Services.AddSingleton<AutoSleepService>();
+            builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

@@ -15,6 +15,7 @@ public static class MauiProgram
 
             // Register services
             builder.Services.AddSingleton<StatusService>();
+            builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

@@ -6,3 +6,63 @@ node_modules
 # Ignored Folders
 /website-backend
 /YabosenStatus
+
+# Build outputs
+**/Installer/
+**/publish-debug/
+**/publish-release/
+
+# .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.cache
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Windows / System
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# MAUI / Mobile
+*.apk
+*.aab
+*.ipa
+*.app
+
+# Logs
+app_start.log
+app_error.txt
+error.txt
+crash.txt
+startup_error.txt

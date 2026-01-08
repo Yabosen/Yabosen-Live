@@ -9,7 +9,6 @@
       "YabosenStatus.Shared/1.0.0": {
         "dependencies": {
           "CommunityToolkit.Mvvm": "8.2.2",
-          "Microsoft.Maui.Controls": "8.0.91",
           "Microsoft.Maui.Controls.Compatibility": "8.0.91"
         },
         "runtime": {
@@ -108,20 +107,6 @@
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.23.53103"
           }
-        }
-      },
-      "Microsoft.Maui.Controls/8.0.91": {
-        "dependencies": {
-          "Microsoft.Maui.Controls.Build.Tasks": "8.0.91",
-          "Microsoft.Maui.Controls.Core": "8.0.91",
-          "Microsoft.Maui.Controls.Xaml": "8.0.91",
-          "Microsoft.Maui.Resizetizer": "8.0.91"
-        }
-      },
-      "Microsoft.Maui.Controls.Build.Tasks/8.0.91": {
-        "dependencies": {
-          "Microsoft.Maui.Controls.Core": "8.0.91",
-          "Microsoft.Maui.Controls.Xaml": "8.0.91"
         }
       },
       "Microsoft.Maui.Controls.Compatibility/8.0.91": {
@@ -304,8 +289,7 @@
             "fileVersion": "8.0.9124.47501"
           }
         }
-      },
-      "Microsoft.Maui.Resizetizer/8.0.91": {}
+      }
     }
   },
   "libraries": {
@@ -377,20 +361,6 @@
       "path": "microsoft.extensions.primitives/8.0.0",
       "hashPath": "microsoft.extensions.primitives.8.0.0.nupkg.sha512"
     },
-    "Microsoft.Maui.Controls/8.0.91": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-gqyrGqSQfYF2SMOS/jpWTBK7KVNsm8p4LvREATKXgEYuLN6ivrOXC+E4TrZaILEiVXB4pQr+kbb7ewzAVjSbeg==",
-      "path": "microsoft.maui.controls/8.0.91",
-      "hashPath": "microsoft.maui.controls.8.0.91.nupkg.sha512"
-    },
-    "Microsoft.Maui.Controls.Build.Tasks/8.0.91": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-is+MHVT02RSJxhBSAx1Z7xTXnalADGpsS2TDUCsgOEjsWrpzDoYwvqk9Yh/eHnvmDHzenMeWAvK7CLmAlaIlIQ==",
-      "path": "microsoft.maui.controls.build.tasks/8.0.91",
-      "hashPath": "microsoft.maui.controls.build.tasks.8.0.91.nupkg.sha512"
-    },
     "Microsoft.Maui.Controls.Compatibility/8.0.91": {
       "type": "package",
       "serviceable": true,
@@ -432,13 +402,6 @@
       "sha512": "sha512-p/LGI3YOcFjnBJaiKZFX0BwtWzh2RPVRQpfAT6Fd+hNViCtM8zJjIMmmFWurJnKK1wytC5AHRdZpfdELhrmugw==",
       "path": "microsoft.maui.graphics/8.0.91",
       "hashPath": "microsoft.maui.graphics.8.0.91.nupkg.sha512"
-    },
-    "Microsoft.Maui.Resizetizer/8.0.91": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-LJF4SsXD4CYk5/W+LxqSHy9CnteHAHuINTKdo2P0xdceZP2J4UZax5ZVPg9KVWBMlL1Gmfqq/sdrkbckgufkmA==",
-      "path": "microsoft.maui.resizetizer/8.0.91",
-      "hashPath": "microsoft.maui.resizetizer.8.0.91.nupkg.sha512"
     }
   }
 }

@@ -1,18 +1,22 @@
 using YabosenStatus.Shared.Models;
 using YabosenStatus.Shared.Services;
 
+using YabosenStatus.Android.Services;
+
 namespace YabosenStatus.Android;
 
 public partial class MainPage : ContentPage
 {
     private readonly StatusService _statusService;
+    private readonly AutoSleepService _autoSleepService;
     private StatusType _currentStatus = StatusType.Offline;
     private ActivityType _selectedActivityType = ActivityType.None;
 
-    public MainPage()
+    public MainPage(StatusService statusService, AutoSleepService autoSleepService)
     {
         InitializeComponent();
-        _statusService = new StatusService();
+        _statusService = statusService;
+        _autoSleepService = autoSleepService;
 
         // Initialize on page load
         Loaded += async (s, e) => await InitializeAsync();
@@ -23,6 +27,11 @@ public partial class MainPage : ContentPage
         try
         {
             await _statusService.InitializeAsync();
+            _autoSleepService.Initialize(); // Init AutoSleep
+            
+            // Load UI State
+            LoadAutoSleepSettings();
+            
             UpdatePasswordDisplay();
             await RefreshCurrentStatus();
         }
@@ -268,5 +277,24 @@ public partial class MainPage : ContentPage
         BtnIdle.IsEnabled = !isLoading;
         BtnSleeping.IsEnabled = !isLoading;
         BtnStreaming.IsEnabled = !isLoading;
+    }
+    private void LoadAutoSleepSettings()
+    {
+        AutoSleepSwitch.IsToggled = Preferences.Get("autosleep_enabled", false);
+        long ticks = Preferences.Get("autosleep_time", new TimeSpan(2, 0, 0).Ticks);
+        AutoSleepTimePicker.Time = TimeSpan.FromTicks(ticks);
+    }
+
+    private void OnSaveAutoSleepSettings(object? sender, EventArgs e)
+    {
+        try
+        {
+            _autoSleepService.UpdateSettings(AutoSleepSwitch.IsToggled, AutoSleepTimePicker.Time);
+            ShowStatusMessage("Auto-Sleep settings saved!", true);
+        }
+        catch (Exception ex)
+        {
+            ShowStatusMessage($"Error saving settings: {ex.Message}", false);
+        }
     }
 }

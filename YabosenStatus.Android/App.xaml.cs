@@ -2,8 +2,11 @@ namespace YabosenStatus.Android;
 
 public partial class App : Application
 {
-    public App()
+    private readonly MainPage _mainPage;
+
+    public App(MainPage mainPage)
     {
+        _mainPage = mainPage;
         try
         {
             InitializeComponent();
@@ -19,7 +22,7 @@ public partial class App : Application
     {
         try
         {
-            return new Window(new MainPage())
+            return new Window(_mainPage)
             {
                 Title = "Yabosen Status"
             };
