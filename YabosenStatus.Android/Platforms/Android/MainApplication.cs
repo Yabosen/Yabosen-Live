@@ -3,7 +3,7 @@ using Android.Runtime;
 
 namespace YabosenStatus.Android;
 
-[Application]
+[Application(Theme = "@style/Maui.MainTheme", Icon = "@mipmap/appicon", RoundIcon = "@mipmap/appicon_round", Debuggable = true)]
 public class MainApplication : MauiApplication
 {
     public MainApplication(IntPtr handle, JniHandleOwnership ownership)

@@ -1,7 +1,8 @@
 using YabosenStatus.Shared.Models;
 using YabosenStatus.Shared.Services;
-
 using YabosenStatus.Android.Services;
+
+
 
 namespace YabosenStatus.Android;
 
@@ -9,6 +10,7 @@ public partial class MainPage : ContentPage
 {
     private readonly StatusService _statusService;
     private readonly AutoSleepService _autoSleepService;
+
     private StatusType _currentStatus = StatusType.Offline;
     private ActivityType _selectedActivityType = ActivityType.None;
 
@@ -27,8 +29,8 @@ public partial class MainPage : ContentPage
         try
         {
             await _statusService.InitializeAsync();
-            _autoSleepService.Initialize(); // Init AutoSleep
-            
+             _autoSleepService.Initialize();
+             
             // Load UI State
             LoadAutoSleepSettings();
             
@@ -38,6 +40,36 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             ShowStatusMessage($"Error: {ex.Message}", false);
+        }
+    }
+
+    private void LoadAutoSleepSettings()
+    {
+        var (isEnabled, timeout) = _autoSleepService.GetSettings();
+        AutoSleepSwitch.IsToggled = isEnabled;
+        AutoSleepTimeoutEntry.Text = timeout.ToString();
+    }
+
+    private void OnAutoSleepToggled(object sender, ToggledEventArgs e)
+    {
+        SaveAutoSleepSettings();
+    }
+
+    private void OnAutoSleepTimeoutChanged(object sender, TextChangedEventArgs e)
+    {
+        // Debounce logic could be added here, but for simplicity we save on change
+        // Validating input to ensure it's a number
+        if (int.TryParse(e.NewTextValue, out _))
+        {
+            SaveAutoSleepSettings();
+        }
+    }
+
+    private void SaveAutoSleepSettings()
+    {
+        if (int.TryParse(AutoSleepTimeoutEntry.Text, out int timeout))
+        {
+            _autoSleepService.UpdateSettings(AutoSleepSwitch.IsToggled, timeout);
         }
     }
 
@@ -278,23 +310,7 @@ public partial class MainPage : ContentPage
         BtnSleeping.IsEnabled = !isLoading;
         BtnStreaming.IsEnabled = !isLoading;
     }
-    private void LoadAutoSleepSettings()
-    {
-        AutoSleepSwitch.IsToggled = Preferences.Get("autosleep_enabled", false);
-        long ticks = Preferences.Get("autosleep_time", new TimeSpan(2, 0, 0).Ticks);
-        AutoSleepTimePicker.Time = TimeSpan.FromTicks(ticks);
-    }
 
-    private void OnSaveAutoSleepSettings(object? sender, EventArgs e)
-    {
-        try
-        {
-            _autoSleepService.UpdateSettings(AutoSleepSwitch.IsToggled, AutoSleepTimePicker.Time);
-            ShowStatusMessage("Auto-Sleep settings saved!", true);
-        }
-        catch (Exception ex)
-        {
-            ShowStatusMessage($"Error saving settings: {ex.Message}", false);
-        }
-    }
+
+
 }

@@ -1,3 +1,4 @@
+using Microsoft.Maui.Graphics;
 namespace YabosenStatus.Shared.Models;
 
 /// <summary>

@@ -2,11 +2,8 @@ namespace YabosenStatus.Android;
 
 public partial class App : Application
 {
-    private readonly MainPage _mainPage;
-
-    public App(MainPage mainPage)
+    public App()
     {
-        _mainPage = mainPage;
         try
         {
             InitializeComponent();
@@ -22,7 +19,11 @@ public partial class App : Application
     {
         try
         {
-            return new Window(_mainPage)
+            // Resolve MainPage from DI
+            var mainPage = Handler?.MauiContext?.Services.GetService<MainPage>()
+                ?? throw new InvalidOperationException("Could not resolve MainPage from DI");
+
+            return new Window(mainPage)
             {
                 Title = "Yabosen Status"
             };
