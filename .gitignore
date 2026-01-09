@@ -6,9 +6,8 @@ node_modules
 # Ignored Folders
 /website-backend
 /YabosenStatus
-/YabosenStatus.Android
-/YabosenStatus.Shared
-/YabosenStatus.Windows
+/YabosenStatus.Android/bin
+/YabosenStatus.Windows/bin
 
 # Build outputs
 **/Installer/
