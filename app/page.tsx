@@ -25,9 +25,9 @@ export default function Home() {
         <div className="w-full max-w-3xl mx-auto">
           {/* Profile Header Section */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-12">
-            {/* Animated Avatar - now fetches from API */}
+            {/* Animated Avatar */}
             <AnimatedAvatar
-              src="/api/avatar"
+              src={siteConfig.avatarUrl || "/emo-avatar.png"}
               alt={siteConfig.name}
               size={140}
             />
