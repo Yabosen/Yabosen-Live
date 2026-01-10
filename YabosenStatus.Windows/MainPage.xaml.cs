@@ -5,6 +5,10 @@ using YabosenStatus.Shared.Models;
 using YabosenStatus.Shared.Services;
 using YabosenStatus.Windows.Services;
 using Application = Microsoft.Maui.Controls.Application;
+#if WINDOWS
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+#endif
 
 namespace YabosenStatus.Windows;
 
@@ -17,16 +21,38 @@ public partial class MainPage : ContentPage
     private ActivityType _selectedActivityType = ActivityType.None;
     
     private bool _isExiting = false;
+    
+    public System.Windows.Input.ICommand ShowCommand { get; }
 
     public MainPage(StatusService statusService)
     {
         InitializeComponent();
+
+        ShowCommand = new Command(ShowWindow);
+        TrayIcon.BindingContext = this;
         
         _statusService = statusService;
         _processMonitorService = new ProcessMonitorService();
         _discordRpcService = new DiscordRpcService();
 
         Loaded += async (s, e) => {
+             // Hook into AppWindow Closing event
+#if WINDOWS
+             if (Window?.Handler?.PlatformView is Microsoft.UI.Xaml.Window win)
+             {
+                 var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(win);
+                 var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+                 var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+                 appWindow.Closing += OnAppWindowClosing;
+                 
+                 // Check start minimized preference
+                 if (Preferences.Get("start_minimized", false))
+                 {
+                      Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(100), HideWindow);
+                 }
+             }
+#endif
+             
              // Startup logic if needed
              await InitializeAsync();
         };
@@ -36,7 +62,6 @@ public partial class MainPage : ContentPage
         {
             _processMonitorService.Dispose();
             _discordRpcService.Dispose();
-            // _trayService?.Dispose();
         };
     }
 
@@ -344,16 +369,48 @@ public partial class MainPage : ContentPage
         // Must run on UI thread
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            // Priority 1: OBS is running
+            // Priority 1: OBS is running (possibly with a game)
             if (activity.IsObsRunning)
             {
-                if (_currentStatus != StatusType.Streaming)
+                // Check if a game is also running
+                string? gameName = null;
+                if (activity.SteamAppId > 0)
                 {
-                    ShowStatusMessage("OBS Detected! Switching to Streaming...", true);
+                    gameName = !string.IsNullOrEmpty(activity.SteamGameName) 
+                        ? activity.SteamGameName 
+                        : $"Steam Game ({activity.SteamAppId})";
+                }
+                
+                bool needsUpdate = _currentStatus != StatusType.Streaming;
+                
+                // Also update if game changed while streaming
+                if (_currentStatus == StatusType.Streaming && gameName != null && GameNameEntry.Text != gameName)
+                {
+                    needsUpdate = true;
+                }
+                
+                if (needsUpdate)
+                {
+                    if (!string.IsNullOrEmpty(gameName))
+                    {
+                        ShowStatusMessage($"Streaming {gameName}...", true);
+                        
+                        // Set activity to Playing so the game name is included in the status update
+                        _selectedActivityType = ActivityType.Playing;
+                        GameNameEntry.Text = gameName;
+                        UpdateActivityUI();
+                    }
+                    else
+                    {
+                        ShowStatusMessage("OBS Detected! Switching to Streaming...", true);
+                        _selectedActivityType = ActivityType.None;
+                        GameNameEntry.Text = string.Empty;
+                    }
+                    
                     await UpdateStatus(StatusType.Streaming);
                 }
             }
-            // Priority 2: Steam Game is running
+            // Priority 2: Steam Game is running (no OBS)
             else if (activity.SteamAppId > 0)
             {
                 // Fallback name if manifest parsing failed
@@ -382,6 +439,11 @@ public partial class MainPage : ContentPage
             // Priority 3: Last.fm Listening
             else if (!string.IsNullOrEmpty(activity.LastFmTrack))
             {
+                // Update Now Playing UI
+                NowPlayingDisplay.IsVisible = true;
+                NotPlayingLabel.IsVisible = false;
+                NowPlayingTrackLabel.Text = activity.LastFmTrack;
+                
                 // Only switch if not already listening to THIS track
                 // We use 'Listening' ActivityType
                  bool isDifferentTrack = _selectedActivityType != ActivityType.Listening || 
@@ -405,11 +467,18 @@ public partial class MainPage : ContentPage
                     WatchingActivitySection.IsVisible = false;
                     
                     await UpdateStatus(StatusType.Online);
+                    
+                    // Update Discord with the track
+                    _discordRpcService.UpdatePresence(await _statusService.GetStatusAsync(), _lastFmTrack);
                 }
             }
             // Priority 4: Nothing special running
             else
             {
+                // Update Now Playing UI to show nothing
+                NowPlayingDisplay.IsVisible = false;
+                NotPlayingLabel.IsVisible = true;
+                
                 // If we were automatically set to Streaming or Playing or Listening, revert
                 if (_currentStatus == StatusType.Streaming || 
                    (_currentStatus == StatusType.Online && (_selectedActivityType == ActivityType.Playing || _selectedActivityType == ActivityType.Listening)))
@@ -420,6 +489,9 @@ public partial class MainPage : ContentPage
                     _selectedActivityType = ActivityType.None;
                     _lastFmTrack = null;
                     await UpdateStatus(StatusType.Online);
+                    
+                    // Clear Discord track
+                    _discordRpcService.UpdatePresence(await _statusService.GetStatusAsync(), null);
                 }
             }
         });
@@ -445,6 +517,85 @@ public partial class MainPage : ContentPage
     {
         LastFmUserEntry.Text = Preferences.Get("lastfm_username", string.Empty);
         LastFmKeyEntry.Text = Preferences.Get("lastfm_apikey", string.Empty);
+        StartMinimizedCheckBox.IsChecked = Preferences.Get("start_minimized", false);
+    }
+    
+    private void OnStartMinimizedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        Preferences.Set("start_minimized", e.Value);
+    }
+
+    private void OnStartMinimizedLabelTapped(object? sender, EventArgs e)
+    {
+        StartMinimizedCheckBox.IsChecked = !StartMinimizedCheckBox.IsChecked;
+    }
+
+#if WINDOWS
+    private void OnAppWindowClosing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)
+    {
+        // If not explicitly exiting, just hide
+        if (!_isExiting)
+        {
+            args.Cancel = true;
+            // Run on UI thread to be safe, though event usually is on UI thread
+            Dispatcher.Dispatch(HideWindow);
+        }
+    }
+#endif
+
+    private void HideWindow()
+    {
+#if WINDOWS
+        if (Window?.Handler?.PlatformView is Microsoft.UI.Xaml.Window win)
+        {
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(win);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+            appWindow.Hide();
+        }
+#endif
+    }
+
+    private void ShowWindow()
+    {
+        try { System.IO.File.AppendAllText("tray_log.txt", $"\nShowWindow called at {DateTime.Now}"); } catch {}
+#if WINDOWS
+        if (Window?.Handler?.PlatformView is Microsoft.UI.Xaml.Window win)
+        {
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(win);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+            
+            // Force restore
+            if (Microsoft.UI.Windowing.AppWindowTitleBar.IsCustomizationSupported()) 
+            {
+               // Just a check, effectively
+            }
+            
+            appWindow.Show();
+            
+            // Try Win32 ShowWindow for good measure
+            // PInvoke would be needed, but let's stick to AppWindow first.
+            
+            win.Activate();
+             try { System.IO.File.AppendAllText("tray_log.txt", " - Window Activated"); } catch {}
+        }
+        else
+        {
+             try { System.IO.File.AppendAllText("tray_log.txt", " - PlatformView is null or not Window"); } catch {}
+        }
+#endif
+    }
+
+    private void OnShowClicked(object? sender, EventArgs e)
+    {
+        ShowWindow();
+    }
+
+    private void OnExitClicked(object? sender, EventArgs e)
+    {
+        _isExiting = true;
+        Application.Current?.Quit();
     }
     
     private async void OnLastFmLinkTapped(object? sender, EventArgs e)
@@ -478,5 +629,110 @@ public partial class MainPage : ContentPage
         BtnIdle.IsEnabled = !isLoading;
         BtnSleeping.IsEnabled = !isLoading;
         BtnStreaming.IsEnabled = !isLoading;
+    }
+
+    private async void OnAvatarUploadTapped(object? sender, EventArgs e)
+    {
+        try
+        {
+            var result = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "Select Avatar Image",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (result != null)
+            {
+                AvatarUploadStatusLabel.Text = "Uploading...";
+                AvatarUploadStatusLabel.TextColor = Color.FromArgb("#9ca3af");
+
+                using var stream = await result.OpenReadAsync();
+                var success = await UploadAvatarAsync(stream, result.FileName);
+
+                if (success)
+                {
+                    AvatarUploadStatusLabel.Text = "✅ Avatar uploaded successfully!";
+                    AvatarUploadStatusLabel.TextColor = Color.FromArgb("#22c55e");
+                }
+                else
+                {
+                    AvatarUploadStatusLabel.Text = "❌ Upload failed";
+                    AvatarUploadStatusLabel.TextColor = Color.FromArgb("#ef4444");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            AvatarUploadStatusLabel.Text = $"❌ Error: {ex.Message}";
+            AvatarUploadStatusLabel.TextColor = Color.FromArgb("#ef4444");
+        }
+    }
+
+    private async Task<bool> UploadAvatarAsync(Stream imageStream, string fileName)
+    {
+        try
+        {
+            // Read image bytes
+            using var memoryStream = new MemoryStream();
+            await imageStream.CopyToAsync(memoryStream);
+            var imageBytes = memoryStream.ToArray();
+
+            // Determine MIME type
+            string mimeType = "image/png";
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+            if (ext == ".jpg" || ext == ".jpeg") mimeType = "image/jpeg";
+            else if (ext == ".gif") mimeType = "image/gif";
+            else if (ext == ".webp") mimeType = "image/webp";
+
+            // Convert to base64 data URL
+            var base64 = Convert.ToBase64String(imageBytes);
+            var dataUrl = $"data:{mimeType};base64,{base64}";
+
+            // Check size
+            if (imageBytes.Length > 500 * 1024)
+            {
+                AvatarUploadStatusLabel.Text = $"❌ Image too large ({imageBytes.Length / 1024}KB). Max 500KB.";
+                AvatarUploadStatusLabel.TextColor = Color.FromArgb("#ef4444");
+                return false;
+            }
+
+            // Send to API
+            using var httpClient = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://yabosen.live/api/avatar");
+            
+            // Get password for auth
+            string? password = null;
+            try { password = await SecureStorage.GetAsync("yabosen_password"); } catch { }
+            if (string.IsNullOrEmpty(password))
+                password = Preferences.Get("yabosen_password", string.Empty);
+
+            if (string.IsNullOrEmpty(password))
+            {
+                AvatarUploadStatusLabel.Text = "❌ Please set your password first";
+                AvatarUploadStatusLabel.TextColor = Color.FromArgb("#ef4444");
+                return false;
+            }
+
+            request.Headers.Add("Authorization", $"Bearer {password}");
+            request.Content = JsonContent.Create(new { avatar = dataUrl });
+
+            var response = await httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                var errorJson = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"Avatar upload failed: {errorJson}");
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Avatar upload error: {ex.Message}");
+            return false;
+        }
     }
 }

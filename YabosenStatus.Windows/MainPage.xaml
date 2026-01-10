@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
              x:Class="YabosenStatus.Windows.MainPage"
+             x:Name="RootPage"
              BackgroundColor="#0f0f0f">
     
     <ContentPage.Resources>
@@ -17,8 +19,15 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="16">
+    <Grid>
+        <tb:TaskbarIcon x:Name="TrayIcon"
+                        IconSource="appicon.ico"
+                        ToolTipText="Yabosen Status"
+                        LeftClickCommand="{Binding ShowCommand}"
+                        DoubleClickCommand="{Binding ShowCommand}"/>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="16">
             
             <!-- Header -->
             <VerticalStackLayout Spacing="4" Margin="0,20,0,10">
@@ -280,7 +289,72 @@
                 </VerticalStackLayout>
             </Frame>
 
-             <!-- Last.fm Settings -->
+            <!-- General Settings Section -->
+            <Frame BackgroundColor="#1a1a1a"
+                   BorderColor="#333333"
+                   CornerRadius="12"
+                   Padding="16"
+                   HasShadow="False"
+                   Margin="0,16,0,0">
+                <VerticalStackLayout Spacing="12">
+                   <Label Text="General Settings"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                           
+                   <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <CheckBox x:Name="StartMinimizedCheckBox"
+                                  CheckedChanged="OnStartMinimizedChanged"
+                                  Color="#a855f7"/>
+                        <Label Text="Start Minimized to Tray"
+                               VerticalOptions="Center"
+                               TextColor="White"
+                               FontSize="14">
+                           <Label.GestureRecognizers>
+                               <TapGestureRecognizer Tapped="OnStartMinimizedLabelTapped"/>
+                           </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    
+                    <!-- Avatar Upload -->
+                    <VerticalStackLayout Spacing="8" Margin="0,8,0,0">
+                        <Label Text="Avatar Upload"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="#9ca3af"/>
+                        <Frame BackgroundColor="#262626"
+                               BorderColor="#6b7280"
+                               CornerRadius="12"
+                               Padding="16"
+                               HasShadow="False">
+                            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                                <Label Text="📷" FontSize="32" HorizontalOptions="Center"/>
+                                <Label Text="Click to select an image"
+                                       TextColor="#9ca3af"
+                                       FontSize="12"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAvatarUploadTapped"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Label x:Name="AvatarUploadStatusLabel"
+                               Text=""
+                               FontSize="11"
+                               TextColor="#22c55e"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                    
+                    <Button Text="Quit Application"
+                            BackgroundColor="#b91c1c"
+                            TextColor="White"
+                            CornerRadius="8"
+                            Clicked="OnExitClicked"
+                            Margin="0,8,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+             <!-- Now Playing Section -->
              <Frame BackgroundColor="#1a1a1a"
                     BorderColor="#333333"
                     CornerRadius="12"
@@ -288,53 +362,76 @@
                     HasShadow="False"
                     Margin="0,16,0,0">
                  <VerticalStackLayout Spacing="12">
-                     <Label Text="Last.fm Integration"
+                     <Label Text="🎵 Now Playing"
                             FontSize="14"
                             FontAttributes="Bold"
                             TextColor="White"/>
                      
-                     <VerticalStackLayout Spacing="4">
-                         <Label Text="Username"
-                                FontSize="12"
-                                TextColor="#9ca3af"/>
-                         <Entry x:Name="LastFmUserEntry"
-                                Placeholder="Your Last.fm username"
-                                PlaceholderColor="#6b7280"
-                                BackgroundColor="#262626"
-                                TextColor="White"
-                                FontSize="14"/>
+                     <!-- Displayed when track is playing -->
+                     <VerticalStackLayout x:Name="NowPlayingDisplay" IsVisible="False" Spacing="4">
+                         <Label x:Name="NowPlayingTrackLabel" 
+                                Text="Artist - Track" 
+                                FontSize="16" 
+                                FontAttributes="Bold"
+                                TextColor="#a855f7"/>
+                         <Label x:Name="NowPlayingSourceLabel" 
+                                Text="Scrobbling via Last.fm" 
+                                FontSize="11" 
+                                TextColor="#6b7280"/>
                      </VerticalStackLayout>
 
-                     <VerticalStackLayout Spacing="4">
-                         <HorizontalStackLayout Spacing="8">
-                             <Label Text="API Key"
-                                    FontSize="12"
-                                    TextColor="#9ca3af"
-                                    VerticalOptions="Center"/>
-                            <Label Text="(Get one here)" 
-                                   TextColor="#3b82f6" 
-                                   FontSize="12" 
-                                   TextDecorations="Underline"
-                                   VerticalOptions="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnLastFmLinkTapped"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                         </HorizontalStackLayout>
-                         <Entry x:Name="LastFmKeyEntry"
-                                Placeholder="Your API Key"
-                                PlaceholderColor="#6b7280"
-                                BackgroundColor="#262626"
-                                TextColor="White"
-                                IsPassword="True"
-                                FontSize="14"/>
-                     </VerticalStackLayout>
-                     
-                     <Button Text="Save Last.fm Settings"
-                             BackgroundColor="#ef4444"
-                             TextColor="White"
-                             CornerRadius="8"
-                             Clicked="OnSaveLastFmSettings"/>
+                     <!-- Displayed when nothing is playing -->
+                     <Label x:Name="NotPlayingLabel" 
+                            Text="Nothing playing right now" 
+                            TextColor="#6b7280" 
+                            FontSize="13"
+                            IsVisible="True"/>
+
+                     <!-- Last.fm Configuration (smaller, secondary styling) -->
+                     <Frame BackgroundColor="#262626" 
+                            CornerRadius="8" 
+                            Padding="12"
+                            BorderColor="Transparent"
+                            HasShadow="False"
+                            Margin="0,8,0,0">
+                         <VerticalStackLayout Spacing="8">
+                             <Label Text="Last.fm Configuration" 
+                                    FontSize="12" 
+                                    FontAttributes="Bold"
+                                    TextColor="#9ca3af"/>
+                             <Entry x:Name="LastFmUserEntry"
+                                    Placeholder="Username"
+                                    PlaceholderColor="#6b7280"
+                                    BackgroundColor="#1a1a1a"
+                                    TextColor="White"
+                                    FontSize="13"/>
+                             <Entry x:Name="LastFmKeyEntry"
+                                    Placeholder="API Key"
+                                    PlaceholderColor="#6b7280"
+                                    BackgroundColor="#1a1a1a"
+                                    TextColor="White"
+                                    IsPassword="True"
+                                    FontSize="13"/>
+                             <HorizontalStackLayout Spacing="8">
+                                 <Button Text="Save"
+                                         BackgroundColor="#ef4444"
+                                         TextColor="White"
+                                         CornerRadius="6"
+                                         HeightRequest="36"
+                                         FontSize="12"
+                                         Clicked="OnSaveLastFmSettings"/>
+                                 <Label Text="Get API Key" 
+                                        TextColor="#3b82f6" 
+                                        FontSize="12" 
+                                        TextDecorations="Underline"
+                                        VerticalOptions="Center">
+                                     <Label.GestureRecognizers>
+                                         <TapGestureRecognizer Tapped="OnLastFmLinkTapped"/>
+                                     </Label.GestureRecognizers>
+                                 </Label>
+                             </HorizontalStackLayout>
+                         </VerticalStackLayout>
+                     </Frame>
                  </VerticalStackLayout>
              </Frame>
 
@@ -360,5 +457,6 @@
                    HorizontalOptions="Center"
                    Margin="0,20,0,10"/>
         </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+    </Grid>
 </ContentPage>

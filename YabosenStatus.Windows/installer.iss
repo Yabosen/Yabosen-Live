@@ -1,8 +1,8 @@
 ; Yabosen Status Installer Script
 ; Inno Setup Script
 
-#define MyAppName "Yabosen Status"
-#define MyAppVersion "1.0.0"
+#define MyAppName "SWCI:YabosenStatus"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Yabosen"
 #define MyAppURL "https://github.com/OttoApocalypse69/Yabosen-Live-test"
 #define MyAppExeName "YabosenStatus.Windows.exe"

@@ -4,6 +4,7 @@ using YabosenStatus.Shared.Models;
 
 
 using YabosenStatus.Android.Services;
+using Plugin.LocalNotification;
 
 namespace YabosenStatus.Android;
 
@@ -22,7 +23,7 @@ public static class MauiProgram
             builder.Services.AddSingleton<AutoSleepService>();
             builder.Services.AddTransient<MainPage>();
 
-            // builder.Services.AddLocalNotification();
+            builder.UseLocalNotification();
 
 #if DEBUG
             // builder.Logging.AddDebug();

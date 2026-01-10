@@ -66,19 +66,30 @@ public class DiscordRpcService : IDisposable
     /// <summary>
     /// Update the Discord Rich Presence based on current status
     /// </summary>
-    public void UpdatePresence(StatusData? status)
+    public void UpdatePresence(StatusData? status, string? nowPlayingTrack = null)
     {
         if (_client == null || !_isInitialized || status == null) return;
 
         try
         {
-            System.Diagnostics.Trace.WriteLine($"[DiscordRPC] Updating presence: {status.Status}");
+            System.Diagnostics.Trace.WriteLine($"[DiscordRPC] Updating presence: {status.Status}, NowPlaying: {nowPlayingTrack}");
+            
+            // Determine state string - prioritize now playing track
+            string stateString;
+            if (!string.IsNullOrEmpty(nowPlayingTrack))
+            {
+                stateString = $"🎵 {nowPlayingTrack}";
+            }
+            else
+            {
+                stateString = GetStateString(status) ?? "Yabosen Status";
+            }
             
             // Create presence - assets are optional, only use if uploaded to Discord Developer Portal
             var presence = new RichPresence
             {
                 Details = GetDetailsString(status),
-                State = GetStateString(status) ?? "Yabosen Status",
+                State = stateString,
                 Timestamps = Timestamps.Now
             };
             

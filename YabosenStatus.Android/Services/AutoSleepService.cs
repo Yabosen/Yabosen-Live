@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-// using Plugin.LocalNotification; 
+using Plugin.LocalNotification; 
 using YabosenStatus.Shared.Models;
 using YabosenStatus.Shared.Services;
 
@@ -115,7 +115,7 @@ public class AutoSleepService
 
         if (result.Success)
         {
-            // await ShowNotification("Auto-Sleep Active", "Your status has been updated to Sleeping automatically.");
+            await ShowNotification("Auto-Sleep Active", "Your status has been updated to Sleeping automatically.");
             _logger.LogInformation("Auto-Sleep triggered successfully");
         }
         else
@@ -124,12 +124,16 @@ public class AutoSleepService
         }
     }
 
-    /*
     public async Task ShowNotification(string title, string message)
     {
-        // Notification logic disabled due to build compatibility issues
+        var request = new NotificationRequest
+        {
+            NotificationId = 100,
+            Title = title,
+            Description = message,
+        };
+        await LocalNotificationCenter.Current.Show(request);
     }
-    */
 
     public void ResetTimer()
     {

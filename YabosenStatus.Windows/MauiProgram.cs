@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using YabosenStatus.Shared.Services;
+using H.NotifyIcon;
 
 namespace YabosenStatus.Windows;
 
@@ -11,7 +12,8 @@ public static class MauiProgram
         {
             var builder = MauiApp.CreateBuilder();
             builder
-                .UseMauiApp<App>();
+                .UseMauiApp<App>()
+                .UseNotifyIcon();
 
             // Register services
             builder.Services.AddSingleton<StatusService>();

@@ -1,6 +1,7 @@
 using YabosenStatus.Shared.Models;
 using YabosenStatus.Shared.Services;
 using YabosenStatus.Android.Services;
+using Plugin.LocalNotification;
 
 
 
@@ -30,6 +31,11 @@ public partial class MainPage : ContentPage
         {
             await _statusService.InitializeAsync();
              _autoSleepService.Initialize();
+             
+             if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
+             {
+                 await LocalNotificationCenter.Current.RequestNotificationPermission();
+             }
              
             // Load UI State
             LoadAutoSleepSettings();
