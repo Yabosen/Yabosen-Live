@@ -66,6 +66,10 @@ export function DiscordStatusIndicator({
         if (!activityType || !activityName) return null
 
         if (activityType === 'playing') {
+            // If status is 'streaming', show "Streaming: GameName" instead of "Playing: GameName"
+            if (status === 'streaming') {
+                return `Streaming: ${activityName}`
+            }
             return `Playing: ${activityName}`
         }
 
