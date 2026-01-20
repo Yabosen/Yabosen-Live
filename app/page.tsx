@@ -55,7 +55,7 @@ export default function Home() {
               />
               <LinkCard
                 name="YouTube"
-                url="https://www.youtube.com/@Yabosen"
+                url="https://www.youtube.com/@Yabosen666"
                 icon={<Youtube className="h-8 w-8" />}
               />
               <LinkCard
