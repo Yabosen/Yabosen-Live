@@ -7,7 +7,17 @@ import { DiscordStatusIndicator } from "./discord-status-indicator"
 
 export function StreamStatus() {
   const { streamStatus } = siteConfig
-  const { status, customMessage, isOnline, loading } = useCustomStatus()
+  const {
+    status,
+    customMessage,
+    isOnline,
+    loading,
+    activityType,
+    activityName,
+    episodeInfo,
+    seasonInfo,
+    startedAt
+  } = useCustomStatus()
 
   // Only show if online
   if (!isOnline) {
@@ -35,6 +45,11 @@ export function StreamStatus() {
             customMessage={customMessage}
             loading={loading}
             isOnline={isOnline}
+            activityType={activityType}
+            activityName={activityName}
+            episodeInfo={episodeInfo}
+            seasonInfo={seasonInfo}
+            startedAt={startedAt}
           />
         </div>
       </Card>
