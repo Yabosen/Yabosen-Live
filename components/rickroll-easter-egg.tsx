@@ -101,12 +101,12 @@ export function RickRollEasterEgg() {
       // If we've reached 5 presses, play the song
       if (newCount >= 5 && !hasPlayed.current) {
         hasPlayed.current = true
-        playYouTubeVideo("VfQRSjAh_EA", 215000) // 3.5 minutes
+        playYouTubeVideo("4D9w9K2SXiM", 190000) // 3.5 minutes
 
         setTimeout(() => {
           hasPlayed.current = false
           setSpaceCount(0)
-        }, 215000)
+        }, 190000)
       }
     }
 
