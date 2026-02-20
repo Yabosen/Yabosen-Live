@@ -149,7 +149,7 @@ export function DiscordStatusIndicator({
             {/* Main Status Text */}
             <span className="text-muted-foreground font-medium flex items-center gap-2">
                 <span>{displayText}</span>
-                {elapsedTime && activityType && (
+                {elapsedTime && (activityType || status === 'streaming') && (
                     <span className="text-xs bg-muted-foreground/10 px-1.5 py-0.5 rounded font-mono">
                         {elapsedTime}
                     </span>
