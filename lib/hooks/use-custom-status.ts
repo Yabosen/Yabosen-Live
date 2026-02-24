@@ -15,6 +15,7 @@ interface StatusData {
     episodeInfo: string | null
     seasonInfo: string | null
     updatedAt: number
+    startedAt?: number
 }
 
 const POLL_INTERVAL = 5000 // 5 seconds
@@ -75,6 +76,7 @@ export function useCustomStatus() {
         episodeInfo: statusData.episodeInfo,
         seasonInfo: statusData.seasonInfo,
         updatedAt: statusData.updatedAt,
+        startedAt: statusData.startedAt,
         loading,
         error,
         isOnline: statusData.status !== 'offline',

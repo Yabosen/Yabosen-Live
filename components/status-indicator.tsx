@@ -4,7 +4,7 @@ import { useCustomStatus } from "@/lib/hooks/use-custom-status"
 import { DiscordStatusIndicator } from "./discord-status-indicator"
 
 export function StatusIndicator() {
-    const { status, customMessage, activityType, activityName, episodeInfo, seasonInfo, loading, isOnline } = useCustomStatus()
+    const { status, customMessage, activityType, activityName, episodeInfo, seasonInfo, loading, isOnline, startedAt } = useCustomStatus()
 
     return (
         <DiscordStatusIndicator
@@ -16,6 +16,7 @@ export function StatusIndicator() {
             seasonInfo={seasonInfo}
             loading={loading}
             isOnline={isOnline}
+            startedAt={startedAt}
         />
     )
 }

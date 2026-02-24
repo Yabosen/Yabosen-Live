@@ -5,6 +5,7 @@ import { StatusIndicator } from "@/components/status-indicator"
 import { LastFmWidget } from "@/components/lastfm-widget"
 import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
 import { HiddenCredits } from "@/components/hidden-credits"
+import { FaceitWidget } from "@/components/faceit-widget"
 import {
   TwitchIcon,
   Youtube,
@@ -41,6 +42,7 @@ export default function Home() {
                 {siteConfig.bio}
               </p>
               <StatusIndicator />
+              <FaceitWidget />
             </div>
           </div>
 
@@ -55,7 +57,7 @@ export default function Home() {
               />
               <LinkCard
                 name="YouTube"
-                url="https://www.youtube.com/@Yabosen"
+                url="https://www.youtube.com/@Yabosen666"
                 icon={<Youtube className="h-8 w-8" />}
               />
               <LinkCard
