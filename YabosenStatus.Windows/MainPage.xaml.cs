@@ -17,6 +17,7 @@ public partial class MainPage : ContentPage
     private readonly StatusService _statusService;
     private readonly DiscordRpcService _discordRpcService;
     private readonly ProcessMonitorService _processMonitorService;
+    private readonly HeartbeatService _heartbeatService;
     private StatusType _currentStatus = StatusType.Offline;
     private ActivityType _selectedActivityType = ActivityType.None;
     
@@ -34,6 +35,7 @@ public partial class MainPage : ContentPage
         _statusService = statusService;
         _processMonitorService = new ProcessMonitorService();
         _discordRpcService = new DiscordRpcService();
+        _heartbeatService = new HeartbeatService(statusService);
 
         Loaded += async (s, e) => {
              // Hook into AppWindow Closing event
@@ -60,6 +62,7 @@ public partial class MainPage : ContentPage
         // Cleanup on unload
         Unloaded += (s, e) => 
         {
+            _heartbeatService.Dispose();
             _processMonitorService.Dispose();
             _discordRpcService.Dispose();
         };
@@ -102,6 +105,9 @@ public partial class MainPage : ContentPage
             UpdatePasswordDisplay();
             LoadLastFmSettings();
             await RefreshCurrentStatus();
+            
+            // Start heartbeat pings so the server knows we're alive
+            await _heartbeatService.StartAsync();
             
             try { System.IO.File.AppendAllText("app_start.log", "\nInit sequence completed"); } catch {}
         }
@@ -592,9 +598,21 @@ public partial class MainPage : ContentPage
         ShowWindow();
     }
 
-    private void OnExitClicked(object? sender, EventArgs e)
+    private async void OnExitClicked(object? sender, EventArgs e)
     {
         _isExiting = true;
+        
+        // Stop heartbeat and send offline status before quitting
+        _heartbeatService.Stop();
+        try
+        {
+            await _statusService.UpdateStatusAsync(StatusType.Offline);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to set offline on exit: {ex.Message}");
+        }
+        
         Application.Current?.Quit();
     }
     

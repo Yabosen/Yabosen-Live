@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "YA+SOiUV3XU=",
+  "dgSpecHash": "t4uDB3W0K0c=",
   "success": true,
   "projectFilePath": "C:\\Users\\razva\\Documents\\GitHub\\Yabosen-Live-test\\YabosenStatus.Android\\YabosenStatus.Android.csproj",
   "expectedPackageFiles": [
@@ -23,7 +23,7 @@
     "C:\\Users\\razva\\.nuget\\packages\\microsoft.maui.essentials\\9.0.0\\microsoft.maui.essentials.9.0.0.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\microsoft.maui.graphics\\9.0.0\\microsoft.maui.graphics.9.0.0.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\microsoft.maui.resizetizer\\9.0.0\\microsoft.maui.resizetizer.9.0.0.nupkg.sha512",
-    "C:\\Users\\razva\\.nuget\\packages\\microsoft.net.illink.tasks\\9.0.11\\microsoft.net.illink.tasks.9.0.11.nupkg.sha512",
+    "C:\\Users\\razva\\.nuget\\packages\\microsoft.net.illink.tasks\\9.0.12\\microsoft.net.illink.tasks.9.0.12.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\plugin.localnotification\\11.1.4\\plugin.localnotification.11.1.4.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\xamarin.android.glide\\4.16.0.6\\xamarin.android.glide.4.16.0.6.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\xamarin.android.glide.annotations\\4.16.0.6\\xamarin.android.glide.annotations.4.16.0.6.nupkg.sha512",
@@ -120,7 +120,10 @@
     "C:\\Users\\razva\\.nuget\\packages\\xamarin.kotlinx.coroutines.core\\1.8.1.3\\xamarin.kotlinx.coroutines.core.1.8.1.3.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\xamarin.kotlinx.coroutines.core.jvm\\1.8.1.3\\xamarin.kotlinx.coroutines.core.jvm.1.8.1.3.nupkg.sha512",
     "C:\\Users\\razva\\.nuget\\packages\\xamarin.kotlinx.serialization.core\\1.7.1.3\\xamarin.kotlinx.serialization.core.1.7.1.3.nupkg.sha512",
-    "C:\\Users\\razva\\.nuget\\packages\\xamarin.kotlinx.serialization.core.jvm\\1.7.1.3\\xamarin.kotlinx.serialization.core.jvm.1.7.1.3.nupkg.sha512"
+    "C:\\Users\\razva\\.nuget\\packages\\xamarin.kotlinx.serialization.core.jvm\\1.7.1.3\\xamarin.kotlinx.serialization.core.jvm.1.7.1.3.nupkg.sha512",
+    "C:\\Users\\razva\\.nuget\\packages\\microsoft.android.ref.35\\35.0.105\\microsoft.android.ref.35.35.0.105.nupkg.sha512",
+    "C:\\Users\\razva\\.nuget\\packages\\microsoft.android.runtime.35.android-arm64\\35.0.105\\microsoft.android.runtime.35.android-arm64.35.0.105.nupkg.sha512",
+    "C:\\Users\\razva\\.nuget\\packages\\microsoft.android.runtime.35.android-x64\\35.0.105\\microsoft.android.runtime.35.android-x64.35.0.105.nupkg.sha512"
   ],
   "logs": []
 }

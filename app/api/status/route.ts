@@ -92,10 +92,31 @@ async function writeStatus(data: StatusData): Promise<void> {
 
 export const dynamic = 'force-dynamic'
 
+// Staleness threshold: 2 minutes (in milliseconds)
+const STALENESS_THRESHOLD_MS = 2 * 60 * 1000
+
 // GET - Public: Fetch current status
 export async function GET() {
   try {
     const status = await readStatus()
+
+    // If the desktop app hasn't sent a heartbeat in 2+ minutes,
+    // treat the user as offline (skip if already offline or sleeping)
+    if (
+      status.status !== 'offline' &&
+      status.status !== 'sleeping' &&
+      Date.now() - status.updatedAt > STALENESS_THRESHOLD_MS
+    ) {
+      return NextResponse.json({
+        ...status,
+        status: 'offline' as StatusType,
+        activityType: null,
+        activityName: null,
+        episodeInfo: null,
+        seasonInfo: null,
+      })
+    }
+
     return NextResponse.json(status)
   } catch (error) {
     console.error('Failed to fetch status:', error)

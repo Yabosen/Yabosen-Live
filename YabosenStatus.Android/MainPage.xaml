@@ -228,10 +228,15 @@
                    HasShadow="False"
                    Margin="0,16,0,0">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Auto-Sleep Settings"
+                    <Label Text="Auto-Sleep (2 AM)"
                            FontSize="14"
                            FontAttributes="Bold"
                            TextColor="White"/>
+
+                    <Label Text="At 2 AM, you'll get a notification asking if you're still awake. If you don't respond within 10 minutes, your status will change to Sleeping."
+                           FontSize="12"
+                           TextColor="#9ca3af"
+                           LineBreakMode="WordWrap"/>
 
                     <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
                         <Label Text="Enable Auto-Sleep"
@@ -243,19 +248,6 @@
                                 OnColor="#6b21a8"
                                 ThumbColor="#f3f4f6"/>
                     </HorizontalStackLayout>
-
-                    <Label Text="Idle Timeout (minutes)"
-                           FontSize="12"
-                           TextColor="#9ca3af"/>
-                    
-                    <Entry x:Name="AutoSleepTimeoutEntry"
-                           Keyboard="Numeric"
-                           Placeholder="30"
-                           PlaceholderColor="#6b7280"
-                           BackgroundColor="#262626"
-                           TextColor="White"
-                           FontSize="14"
-                           TextChanged="OnAutoSleepTimeoutChanged"/>
                 </VerticalStackLayout>
             </Frame>
 

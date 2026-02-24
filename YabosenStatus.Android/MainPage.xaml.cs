@@ -36,6 +36,9 @@ public partial class MainPage : ContentPage
              {
                  await LocalNotificationCenter.Current.RequestNotificationPermission();
              }
+
+             // Start foreground service to keep the app alive in the background
+             StartForegroundService();
              
             // Load UI State
             LoadAutoSleepSettings();
@@ -49,34 +52,32 @@ public partial class MainPage : ContentPage
         }
     }
 
+    private void StartForegroundService()
+    {
+#if ANDROID
+        var intent = new global::Android.Content.Intent(
+            global::Android.App.Application.Context,
+            typeof(YabosenStatus.Android.Services.StatusForegroundService));
+
+        if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.O)
+        {
+            global::Android.App.Application.Context.StartForegroundService(intent);
+        }
+        else
+        {
+            global::Android.App.Application.Context.StartService(intent);
+        }
+#endif
+    }
+
     private void LoadAutoSleepSettings()
     {
-        var (isEnabled, timeout) = _autoSleepService.GetSettings();
-        AutoSleepSwitch.IsToggled = isEnabled;
-        AutoSleepTimeoutEntry.Text = timeout.ToString();
+        AutoSleepSwitch.IsToggled = _autoSleepService.IsEnabled;
     }
 
     private void OnAutoSleepToggled(object sender, ToggledEventArgs e)
     {
-        SaveAutoSleepSettings();
-    }
-
-    private void OnAutoSleepTimeoutChanged(object sender, TextChangedEventArgs e)
-    {
-        // Debounce logic could be added here, but for simplicity we save on change
-        // Validating input to ensure it's a number
-        if (int.TryParse(e.NewTextValue, out _))
-        {
-            SaveAutoSleepSettings();
-        }
-    }
-
-    private void SaveAutoSleepSettings()
-    {
-        if (int.TryParse(AutoSleepTimeoutEntry.Text, out int timeout))
-        {
-            _autoSleepService.UpdateSettings(AutoSleepSwitch.IsToggled, timeout);
-        }
+        _autoSleepService.UpdateSettings(e.Value);
     }
 
     private async Task RefreshCurrentStatus()
