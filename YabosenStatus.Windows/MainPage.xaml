@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
+             x:Class="YabosenStatus.Windows.MainPage"
+             x:Name="RootPage"
+             BackgroundColor="#0f0f0f">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="StatusButtonStyle" TargetType="Button">
+                <Setter Property="HeightRequest" Value="80" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="Margin" Value="4" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
+    <Grid>
+        <tb:TaskbarIcon x:Name="TrayIcon"
+                        IconSource="appicon.ico"
+                        ToolTipText="Yabosen Status"
+                        LeftClickCommand="{Binding ShowCommand}"
+                        DoubleClickCommand="{Binding ShowCommand}"/>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="16">
+            
+            <!-- Header -->
+            <VerticalStackLayout Spacing="4" Margin="0,20,0,10">
+                <Label Text="Yabosen Status"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Windows Desktop App"
+                       FontSize="14"
+                       TextColor="#9ca3af"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Current Status Display -->
+            <Frame BackgroundColor="#1a1a1a" 
+                   BorderColor="#333333"
+                   CornerRadius="16"
+                   Padding="20"
+                   HasShadow="False">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Current Status"
+                           FontSize="12"
+                           TextColor="#9ca3af"/>
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                        <Frame x:Name="CurrentStatusDot"
+                               WidthRequest="16"
+                               HeightRequest="16"
+                               CornerRadius="8"
+                               BackgroundColor="#6b7280"
+                               HasShadow="False"
+                               Padding="0"/>
+                        <Label x:Name="CurrentStatusLabel"
+                               Text="Loading..."
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <Label x:Name="CurrentMessageLabel"
+                           Text=""
+                           FontSize="14"
+                           TextColor="#9ca3af"
+                           IsVisible="False"/>
+                    <Label x:Name="LastUpdatedLabel"
+                           Text=""
+                           FontSize="11"
+                           TextColor="#6b7280"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Status Buttons Grid -->
+            <Label Text="Set Status"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   TextColor="#9ca3af"
+                   Margin="0,10,0,0"/>
+            
+            <Grid ColumnDefinitions="*,*" 
+                  RowDefinitions="Auto,Auto,Auto"
+                  ColumnSpacing="12"
+                  RowSpacing="12">
+                
+                <!-- Row 1 -->
+                <Button x:Name="BtnOnline"
+                        Text="🟢 Online"
+                        BackgroundColor="#166534"
+                        Clicked="OnStatusClicked"
+                        Grid.Row="0" Grid.Column="0"
+                        Style="{StaticResource StatusButtonStyle}"/>
+                
+                <Button x:Name="BtnOffline"
+                        Text="⚫ Offline"
+                        BackgroundColor="#374151"
+                        Clicked="OnStatusClicked"
+                        Grid.Row="0" Grid.Column="1"
+                        Style="{StaticResource StatusButtonStyle}"/>
+                
+                <!-- Row 2 -->
+                <Button x:Name="BtnDnd"
+                        Text="🔴 DND"
+                        BackgroundColor="#991b1b"
+                        Clicked="OnStatusClicked"
+                        Grid.Row="1" Grid.Column="0"
+                        Style="{StaticResource StatusButtonStyle}"/>
+                
+                <Button x:Name="BtnIdle"
+                        Text="🟡 Idle"
+                        BackgroundColor="#854d0e"
+                        Clicked="OnStatusClicked"
+                        Grid.Row="1" Grid.Column="1"
+                        Style="{StaticResource StatusButtonStyle}"/>
+                
+                <!-- Row 3 -->
+                <Button x:Name="BtnSleeping"
+                        Text="🌙 Sleeping"
+                        BackgroundColor="#6b21a8"
+                        Clicked="OnStatusClicked"
+                        Grid.Row="2" Grid.Column="0"
+                        Style="{StaticResource StatusButtonStyle}"/>
+                
+                <Button x:Name="BtnStreaming"
+                        Text="📺 Streaming"
+                        BackgroundColor="#b91c1c"
+                        Clicked="OnStatusClicked"
+                        Grid.Row="2" Grid.Column="1"
+                        Style="{StaticResource StatusButtonStyle}"/>
+            </Grid>
+
+            <!-- Activity Type Selection -->
+            <Frame BackgroundColor="#1a1a1a"
+                   BorderColor="#333333"
+                   CornerRadius="12"
+                   Padding="16"
+                   HasShadow="False"
+                   Margin="0,8,0,0">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Activity (optional)"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           TextColor="#9ca3af"/>
+
+                    <!-- Activity Type Buttons -->
+                    <HorizontalStackLayout Spacing="12">
+                        <Button x:Name="BtnPlayingActivity"
+                                Text="🎮 Playing"
+                                BackgroundColor="#374151"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnActivityTypeClicked"
+                                HorizontalOptions="FillAndExpand"/>
+                        <Button x:Name="BtnWatchingActivity"
+                                Text="📺 Watching"
+                                BackgroundColor="#374151"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnActivityTypeClicked"
+                                HorizontalOptions="FillAndExpand"/>
+                        <Button x:Name="BtnClearActivity"
+                                Text="✖"
+                                BackgroundColor="#374151"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnClearActivityClicked"
+                                WidthRequest="50"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Playing Activity Section -->
+                    <VerticalStackLayout x:Name="PlayingActivitySection" Spacing="8" IsVisible="False">
+                        <Label Text="Game Name"
+                               FontSize="12"
+                               TextColor="#9ca3af"/>
+                        <Entry x:Name="GameNameEntry"
+                               Placeholder="e.g., Counter-Strike 2"
+                               PlaceholderColor="#6b7280"
+                               BackgroundColor="#262626"
+                               TextColor="White"
+                               FontSize="14"/>
+                    </VerticalStackLayout>
+
+                    <!-- Watching Activity Section -->
+                    <VerticalStackLayout x:Name="WatchingActivitySection" Spacing="8" IsVisible="False">
+                        <Label Text="Anime/Movie Name"
+                               FontSize="12"
+                               TextColor="#9ca3af"/>
+                        <Entry x:Name="AnimeNameEntry"
+                               Placeholder="e.g., Demon Slayer"
+                               PlaceholderColor="#6b7280"
+                               BackgroundColor="#262626"
+                               TextColor="White"
+                               FontSize="14"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="Episode (optional)"
+                                       FontSize="12"
+                                       TextColor="#9ca3af"/>
+                                <Entry x:Name="EpisodeInfoEntry"
+                                       Placeholder="e.g., 7/12"
+                                       PlaceholderColor="#6b7280"
+                                       BackgroundColor="#262626"
+                                       TextColor="White"
+                                       FontSize="14"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Season (optional)"
+                                       FontSize="12"
+                                       TextColor="#9ca3af"/>
+                                <Entry x:Name="SeasonInfoEntry"
+                                       Placeholder="e.g., Season 2"
+                                       PlaceholderColor="#6b7280"
+                                       BackgroundColor="#262626"
+                                       TextColor="White"
+                                       FontSize="14"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Custom Message (Legacy Support) -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Custom Message (optional)"
+                               FontSize="12"
+                               TextColor="#9ca3af"/>
+                        <Entry x:Name="CustomMessageEntry"
+                               Placeholder="Additional custom message"
+                               PlaceholderColor="#6b7280"
+                               BackgroundColor="#262626"
+                               TextColor="White"
+                               FontSize="14"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Settings Section -->
+            <Frame BackgroundColor="#1a1a1a"
+                   BorderColor="#333333"
+                   CornerRadius="12"
+                   Padding="16"
+                   HasShadow="False"
+                   Margin="0,16,0,0">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Connection Settings"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                    
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="Password:"
+                               FontSize="12"
+                               TextColor="#9ca3af"
+                               VerticalOptions="Center"/>
+                        <Label x:Name="PasswordPreviewLabel"
+                               Text="Not set"
+                               FontSize="12"
+                               TextColor="#6b7280"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    
+                    <Entry x:Name="PasswordEntry"
+                           Placeholder="Enter admin password"
+                           PlaceholderColor="#6b7280"
+                           BackgroundColor="#262626"
+                           TextColor="White"
+                           IsPassword="True"
+                           FontSize="14"/>
+                    
+                    <HorizontalStackLayout Spacing="12">
+                        <Button Text="Save"
+                                BackgroundColor="#6b21a8"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnSavePassword"/>
+                        <Button Text="Clear"
+                                BackgroundColor="#374151"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OnClearPassword"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- General Settings Section -->
+            <Frame BackgroundColor="#1a1a1a"
+                   BorderColor="#333333"
+                   CornerRadius="12"
+                   Padding="16"
+                   HasShadow="False"
+                   Margin="0,16,0,0">
+                <VerticalStackLayout Spacing="12">
+                   <Label Text="General Settings"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+                           
+                   <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <CheckBox x:Name="StartMinimizedCheckBox"
+                                  CheckedChanged="OnStartMinimizedChanged"
+                                  Color="#a855f7"/>
+                        <Label Text="Start Minimized to Tray"
+                               VerticalOptions="Center"
+                               TextColor="White"
+                               FontSize="14">
+                           <Label.GestureRecognizers>
+                               <TapGestureRecognizer Tapped="OnStartMinimizedLabelTapped"/>
+                           </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    
+                    <!-- Avatar Upload -->
+                    <VerticalStackLayout Spacing="8" Margin="0,8,0,0">
+                        <Label Text="Avatar Upload"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="#9ca3af"/>
+                        <Frame BackgroundColor="#262626"
+                               BorderColor="#6b7280"
+                               CornerRadius="12"
+                               Padding="16"
+                               HasShadow="False">
+                            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                                <Label Text="📷" FontSize="32" HorizontalOptions="Center"/>
+                                <Label Text="Click to select an image"
+                                       TextColor="#9ca3af"
+                                       FontSize="12"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAvatarUploadTapped"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Label x:Name="AvatarUploadStatusLabel"
+                               Text=""
+                               FontSize="11"
+                               TextColor="#22c55e"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                    
+                    <Button Text="Quit Application"
+                            BackgroundColor="#b91c1c"
+                            TextColor="White"
+                            CornerRadius="8"
+                            Clicked="OnExitClicked"
+                            Margin="0,8,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+             <!-- Now Playing Section -->
+             <Frame BackgroundColor="#1a1a1a"
+                    BorderColor="#333333"
+                    CornerRadius="12"
+                    Padding="16"
+                    HasShadow="False"
+                    Margin="0,16,0,0">
+                 <VerticalStackLayout Spacing="12">
+                     <Label Text="🎵 Now Playing"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            TextColor="White"/>
+                     
+                     <!-- Displayed when track is playing -->
+                     <VerticalStackLayout x:Name="NowPlayingDisplay" IsVisible="False" Spacing="4">
+                         <Label x:Name="NowPlayingTrackLabel" 
+                                Text="Artist - Track" 
+                                FontSize="16" 
+                                FontAttributes="Bold"
+                                TextColor="#a855f7"/>
+                         <Label x:Name="NowPlayingSourceLabel" 
+                                Text="Scrobbling via Last.fm" 
+                                FontSize="11" 
+                                TextColor="#6b7280"/>
+                     </VerticalStackLayout>
+
+                     <!-- Displayed when nothing is playing -->
+                     <Label x:Name="NotPlayingLabel" 
+                            Text="Nothing playing right now" 
+                            TextColor="#6b7280" 
+                            FontSize="13"
+                            IsVisible="True"/>
+
+                     <!-- Last.fm Configuration (smaller, secondary styling) -->
+                     <Frame BackgroundColor="#262626" 
+                            CornerRadius="8" 
+                            Padding="12"
+                            BorderColor="Transparent"
+                            HasShadow="False"
+                            Margin="0,8,0,0">
+                         <VerticalStackLayout Spacing="8">
+                             <Label Text="Last.fm Configuration" 
+                                    FontSize="12" 
+                                    FontAttributes="Bold"
+                                    TextColor="#9ca3af"/>
+                             <Entry x:Name="LastFmUserEntry"
+                                    Placeholder="Username"
+                                    PlaceholderColor="#6b7280"
+                                    BackgroundColor="#1a1a1a"
+                                    TextColor="White"
+                                    FontSize="13"/>
+                             <Entry x:Name="LastFmKeyEntry"
+                                    Placeholder="API Key"
+                                    PlaceholderColor="#6b7280"
+                                    BackgroundColor="#1a1a1a"
+                                    TextColor="White"
+                                    IsPassword="True"
+                                    FontSize="13"/>
+                             <HorizontalStackLayout Spacing="8">
+                                 <Button Text="Save"
+                                         BackgroundColor="#ef4444"
+                                         TextColor="White"
+                                         CornerRadius="6"
+                                         HeightRequest="36"
+                                         FontSize="12"
+                                         Clicked="OnSaveLastFmSettings"/>
+                                 <Label Text="Get API Key" 
+                                        TextColor="#3b82f6" 
+                                        FontSize="12" 
+                                        TextDecorations="Underline"
+                                        VerticalOptions="Center">
+                                     <Label.GestureRecognizers>
+                                         <TapGestureRecognizer Tapped="OnLastFmLinkTapped"/>
+                                     </Label.GestureRecognizers>
+                                 </Label>
+                             </HorizontalStackLayout>
+                         </VerticalStackLayout>
+                     </Frame>
+                 </VerticalStackLayout>
+             </Frame>
+
+            <!-- Status Indicator -->
+            <Label x:Name="StatusMessageLabel"
+                   Text=""
+                   FontSize="13"
+                   TextColor="#22c55e"
+                   HorizontalOptions="Center"
+                   Margin="0,8,0,0"/>
+
+            <!-- Activity Indicator -->
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="#a855f7"
+                               HorizontalOptions="Center"/>
+
+            <!-- Footer -->
+            <Label Text="yabosen.live • Windows"
+                   FontSize="12"
+                   TextColor="#4b5563"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,10"/>
+        </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

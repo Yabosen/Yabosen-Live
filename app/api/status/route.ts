@@ -93,10 +93,58 @@ async function writeStatus(data: StatusData): Promise<void> {
 
 export const dynamic = 'force-dynamic'
 
+// Staleness threshold: 2 minutes (in milliseconds)
+const STALENESS_THRESHOLD_MS = 2 * 60 * 1000
+
 // GET - Public: Fetch current status
 export async function GET() {
   try {
+    const redis = getRedisClient()
     const status = await readStatus()
+
+    // If status is offline or sleeping, skip staleness logic
+    if (status.status === 'offline' || status.status === 'sleeping') {
+      return NextResponse.json(status)
+    }
+
+    // Check per-source heartbeat freshness
+    const [pcHeartbeat, mobileHeartbeat] = await Promise.all([
+      redis.get<number>('yabosen:heartbeat:pc'),
+      redis.get<number>('yabosen:heartbeat:mobile'),
+    ])
+
+    const now = Date.now()
+    const pcAlive = pcHeartbeat != null && (now - pcHeartbeat) < STALENESS_THRESHOLD_MS
+    const mobileAlive = mobileHeartbeat != null && (now - mobileHeartbeat) < STALENESS_THRESHOLD_MS
+
+    // PC alive → keep current status (Online, DND, etc.)
+    if (pcAlive) {
+      return NextResponse.json(status)
+    }
+
+    // PC stale but mobile alive → show idle
+    if (!pcAlive && mobileAlive) {
+      return NextResponse.json({
+        ...status,
+        status: 'idle' as StatusType,
+      })
+    }
+
+    // Both stale → offline
+    if (!pcAlive && !mobileAlive) {
+      // Also fall back to staleness on updatedAt for backwards compatibility
+      if (Date.now() - status.updatedAt > STALENESS_THRESHOLD_MS) {
+        return NextResponse.json({
+          ...status,
+          status: 'offline' as StatusType,
+          activityType: null,
+          activityName: null,
+          episodeInfo: null,
+          seasonInfo: null,
+        })
+      }
+    }
+
     return NextResponse.json(status)
   } catch (error) {
     console.error('Failed to fetch status:', error)

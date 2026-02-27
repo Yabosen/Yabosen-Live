@@ -3,7 +3,85 @@ node_modules
 .env.local
 .env*.local
 
-# Ignored Folders
-/website-backend
-/YabosenStatus
-nul
+# ============================================
+# Non-site stuff (Windows/Android/Desktop apps)
+# ============================================
+/YabosenStatus/
+/YabosenStatus.Android/
+/YabosenStatus.Windows/
+/YabosenStatus.Shared/
+YabosenStatus.sln
+YabosenStatus.sln.DotSettings.user
+/Better-Anime/
+global.json
+
+# Build outputs & installers
+**/Installer/
+**/publish-debug/
+**/publish-release/
+
+# .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.cache
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Windows / System
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+
+# MAUI / Mobile binaries
+*.apk
+*.aab
+*.ipa
+*.app
+
+# Logs & build artifacts
+*.log
+app_start.log
+app_error.txt
+error.txt
+crash.txt
+startup_error.txt
+build_*.txt
+build_*.log
+publish_log.txt
+msbuild.log
+tray_log.txt
+restore_*.txt
+
+# Generated / temp
+next-env.d.ts
+temp_status.ts

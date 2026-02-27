@@ -1,0 +1,19 @@
+﻿  Determining projects to restore...
+  Restored C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj (in 1.2 sec).
+  1 of 2 projects are up-to-date for restore.
+  YabosenStatus.Shared -> C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Shared\bin\Debug\net8.0\YabosenStatus.Shared.dll
+  YabosenStatus.Android -> C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\bin\Debug\net8.0-android\YabosenStatus.Android.dll
+  YabosenStatus.Shared -> C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Shared\bin\Debug\net8.0\YabosenStatus.Shared.dll
+JAVAC : warning : [options] source value 8 is obsolete and will be removed in a future release [C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj]
+JAVAC : warning : [options] target value 8 is obsolete and will be removed in a future release [C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj]
+JAVAC : warning : [options] To suppress warnings about obsolete options, use -Xlint:-options. [C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj]
+
+Build succeeded.
+
+JAVAC : warning : [options] source value 8 is obsolete and will be removed in a future release [C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj]
+JAVAC : warning : [options] target value 8 is obsolete and will be removed in a future release [C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj]
+JAVAC : warning : [options] To suppress warnings about obsolete options, use -Xlint:-options. [C:\Users\razva\Documents\GitHub\Yabosen-Live-test\YabosenStatus.Android\YabosenStatus.Android.csproj]
+    3 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:47.27
