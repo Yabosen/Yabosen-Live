@@ -41,7 +41,11 @@
     <MauiImage Include="Resources\Images\*" Condition="Exists('Resources\Images')" />
 
     <!-- Raw Assets - only include if folder has files -->
-    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" Condition="Exists('Resources\Raw')" />
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" Condition="Exists('Resources\Raw')" Exclude="Resources\Raw\desktop.ini" />
+    
+    <!-- Exclude desktop.ini files from publish output -->
+    <Content Remove="**\desktop.ini" />
+    <None Remove="**\desktop.ini" />
 
     <!-- Fonts - only include if folder has files -->
     <MauiFont Include="Resources\Fonts\*" Condition="Exists('Resources\Fonts')" />

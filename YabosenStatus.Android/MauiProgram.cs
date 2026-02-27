@@ -21,6 +21,7 @@ public static class MauiProgram
             // Register services
             builder.Services.AddSingleton<StatusService>();
             builder.Services.AddSingleton<AutoSleepService>();
+            builder.Services.AddSingleton<MobileHeartbeatService>();
             builder.Services.AddTransient<MainPage>();
 
             builder.UseLocalNotification();

@@ -11,15 +11,17 @@ public partial class MainPage : ContentPage
 {
     private readonly StatusService _statusService;
     private readonly AutoSleepService _autoSleepService;
+    private readonly MobileHeartbeatService _heartbeatService;
 
     private StatusType _currentStatus = StatusType.Offline;
     private ActivityType _selectedActivityType = ActivityType.None;
 
-    public MainPage(StatusService statusService, AutoSleepService autoSleepService)
+    public MainPage(StatusService statusService, AutoSleepService autoSleepService, MobileHeartbeatService heartbeatService)
     {
         InitializeComponent();
         _statusService = statusService;
         _autoSleepService = autoSleepService;
+        _heartbeatService = heartbeatService;
 
         // Initialize on page load
         Loaded += async (s, e) => await InitializeAsync();
@@ -40,6 +42,11 @@ public partial class MainPage : ContentPage
              // Start foreground service to keep the app alive in the background
              StartForegroundService();
              
+            // Initialize mobile heartbeat (loads password)
+            await _heartbeatService.InitializeAsync();
+            // Start sending heartbeats (app is in foreground right now)
+            _heartbeatService.Resume();
+             
             // Load UI State
             LoadAutoSleepSettings();
             
@@ -50,6 +57,26 @@ public partial class MainPage : ContentPage
         {
             ShowStatusMessage($"Error: {ex.Message}", false);
         }
+    }
+
+    /// <summary>
+    /// Called when the page becomes visible (foreground).
+    /// Resume mobile heartbeats so the server knows the app is actively open.
+    /// </summary>
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        _heartbeatService.Resume();
+    }
+
+    /// <summary>
+    /// Called when the page is no longer visible (background/closed).
+    /// Pause heartbeats so the server treats mobile as stale.
+    /// </summary>
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _heartbeatService.Pause();
     }
 
     private void StartForegroundService()

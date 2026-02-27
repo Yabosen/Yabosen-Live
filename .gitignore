@@ -3,13 +3,19 @@ node_modules
 .env.local
 .env*.local
 
-# Ignored Folders
-/website-backend
-/YabosenStatus
-/YabosenStatus.Android
-/YabosenStatus.Windows
+# ============================================
+# Non-site stuff (Windows/Android/Desktop apps)
+# ============================================
+/YabosenStatus/
+/YabosenStatus.Android/
+/YabosenStatus.Windows/
+/YabosenStatus.Shared/
+YabosenStatus.sln
+YabosenStatus.sln.DotSettings.user
+/Better-Anime/
+global.json
 
-# Build outputs
+# Build outputs & installers
 **/Installer/
 **/publish-debug/
 **/publish-release/
@@ -42,7 +48,6 @@ node_modules
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
-*.log
 *.vspscc
 *.vssscc
 .builds
@@ -54,23 +59,29 @@ node_modules
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+desktop.ini
 $RECYCLE.BIN/
 
-# MAUI / Mobile
+# MAUI / Mobile binaries
 *.apk
 *.aab
 *.ipa
 *.app
 
-# Logs
+# Logs & build artifacts
+*.log
 app_start.log
 app_error.txt
 error.txt
 crash.txt
 startup_error.txt
-
-# Added by Gemini
 build_*.txt
+build_*.log
 publish_log.txt
+msbuild.log
+tray_log.txt
+restore_*.txt
+
+# Generated / temp
 next-env.d.ts
-YabosenStatus.sln
+temp_status.ts

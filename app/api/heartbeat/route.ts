@@ -16,8 +16,8 @@ function getRedisClient() {
 
 export const dynamic = 'force-dynamic'
 
-// POST - Heartbeat ping from the desktop app
-// Updates only the `updatedAt` timestamp without changing any status fields
+// POST - Heartbeat ping from desktop or mobile app
+// Updates `updatedAt` timestamp and stores per-source heartbeat
 export async function POST(request: Request) {
     try {
         // Verify API Key
@@ -31,9 +31,16 @@ export async function POST(request: Request) {
             )
         }
 
+        // Parse body to get source (pc or mobile)
+        const body = await request.json().catch(() => ({}))
+        const source = body?.source === 'mobile' ? 'mobile' : 'pc'
+
         const redis = getRedisClient()
 
-        // Read current status data
+        // Store per-source heartbeat timestamp
+        await redis.set(`yabosen:heartbeat:${source}`, Date.now())
+
+        // Also update the main status updatedAt
         const currentData = await redis.get<Record<string, unknown>>(REDIS_KEY)
 
         if (!currentData) {
@@ -51,7 +58,7 @@ export async function POST(request: Request) {
 
         await redis.set(REDIS_KEY, updatedData)
 
-        return NextResponse.json({ success: true, updatedAt: updatedData.updatedAt })
+        return NextResponse.json({ success: true, source, updatedAt: updatedData.updatedAt })
     } catch (error) {
         console.error('Heartbeat error:', error)
         return NextResponse.json(

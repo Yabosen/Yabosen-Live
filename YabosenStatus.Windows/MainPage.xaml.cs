@@ -109,6 +109,21 @@ public partial class MainPage : ContentPage
             // Start heartbeat pings so the server knows we're alive
             await _heartbeatService.StartAsync();
             
+            // Auto-set status to Online on startup
+            if (_statusService.HasPassword)
+            {
+                try
+                {
+                    await _statusService.UpdateStatusAsync(StatusType.Online);
+                    await RefreshCurrentStatus();
+                    try { System.IO.File.AppendAllText("app_start.log", "\nAuto-set Online"); } catch {}
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to auto-set online: {ex.Message}");
+                }
+            }
+            
             try { System.IO.File.AppendAllText("app_start.log", "\nInit sequence completed"); } catch {}
         }
         catch (Exception ex)

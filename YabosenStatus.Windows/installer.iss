@@ -21,7 +21,7 @@ AllowNoIcons=yes
 ; Output settings
 OutputDir=.\Installer
 OutputBaseFilename=YabosenStatus-Setup-{#MyAppVersion}
-SetupIconFile=.\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\appicon.ico
+SetupIconFile=.\bin\Release\net9.0-windows10.0.19041.0\win-x64\publish\appicon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
@@ -36,7 +36,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "startupicon"; Description: "Start with Windows"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: ".\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ".\bin\Release\net9.0-windows10.0.19041.0\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
