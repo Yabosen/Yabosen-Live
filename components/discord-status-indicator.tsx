@@ -2,6 +2,7 @@
 
 import { Circle, Moon, Video } from "lucide-react"
 import { StatusType } from "@/lib/hooks/use-custom-status"
+import { useState, useEffect } from "react"
 
 interface DiscordStatusIndicatorProps {
     status: StatusType
@@ -12,6 +13,7 @@ interface DiscordStatusIndicatorProps {
     seasonInfo: string | null
     loading: boolean
     isOnline: boolean
+    startedAt?: number
 }
 
 const statusColors: Record<StatusType, { color: string; label: string; icon?: 'moon' | 'video' }> = {
@@ -31,7 +33,8 @@ export function DiscordStatusIndicator({
     episodeInfo,
     seasonInfo,
     loading,
-    isOnline
+    isOnline,
+    startedAt
 }: DiscordStatusIndicatorProps) {
     if (loading) {
         return (
@@ -44,6 +47,45 @@ export function DiscordStatusIndicator({
 
     const config = statusColors[status] || statusColors.offline
     const showPulse = isOnline && status !== 'sleeping'
+
+    // Timer logic
+    const [elapsedTime, setElapsedTime] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!startedAt) {
+            setElapsedTime(null)
+            return
+        }
+
+        const updateTimer = () => {
+            const now = Date.now()
+            const diff = now - startedAt
+
+            if (diff < 0) {
+                setElapsedTime("00:00")
+                return
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60))
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+            const formattedMinutes = minutes.toString().padStart(2, '0')
+            const formattedSeconds = seconds.toString().padStart(2, '0')
+
+            if (hours > 0) {
+                const formattedHours = hours.toString().padStart(2, '0')
+                setElapsedTime(`${formattedHours}:${formattedMinutes}:${formattedSeconds}`)
+            } else {
+                setElapsedTime(`${formattedMinutes}:${formattedSeconds}`)
+            }
+        }
+
+        updateTimer() // Initial call
+        const interval = setInterval(updateTimer, 1000)
+
+        return () => clearInterval(interval)
+    }, [startedAt])
 
     // Choose icon based on status
     const renderIcon = () => {
@@ -105,8 +147,13 @@ export function DiscordStatusIndicator({
             </div>
 
             {/* Main Status Text */}
-            <span className="text-muted-foreground font-medium">
-                {displayText}
+            <span className="text-muted-foreground font-medium flex items-center gap-2">
+                <span>{displayText}</span>
+                {elapsedTime && (activityType || status === 'streaming') && (
+                    <span className="text-xs bg-muted-foreground/10 px-1.5 py-0.5 rounded font-mono">
+                        {elapsedTime}
+                    </span>
+                )}
             </span>
 
             {/* Secondary Text (if we showed activity, show custom message or label as secondary if needed, but keeping it simple for now) */}

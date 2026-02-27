@@ -12,6 +12,7 @@ interface StatusData {
   episodeInfo: string | null
   seasonInfo: string | null
   updatedAt: number
+  startedAt?: number
 }
 
 const REDIS_KEY = 'yabosen:status'
@@ -208,6 +209,25 @@ export async function POST(request: Request) {
       )
     }
 
+    // Retrieve current status to check for changes
+    const currentStatus = await readStatus()
+    let startedAt = Date.now()
+
+    // Check if the activity is the same
+    // We consider it the same if:
+    // 1. Status is the same
+    // 2. Activity Type is the same
+    // 3. Activity Name is the same
+    // If it's the same, we keep the old startedAt
+    if (
+      currentStatus.status === status &&
+      currentStatus.activityType === (activityType || null) &&
+      currentStatus.activityName === (activityName || null) &&
+      currentStatus.startedAt
+    ) {
+      startedAt = currentStatus.startedAt
+    }
+
     // Update and persist status
     const newStatus: StatusData = {
       status: status as StatusType,
@@ -217,6 +237,7 @@ export async function POST(request: Request) {
       episodeInfo: episodeInfo || null,
       seasonInfo: seasonInfo || null,
       updatedAt: Date.now(),
+      startedAt
     }
 
     console.log('Writing to Redis:', newStatus)
