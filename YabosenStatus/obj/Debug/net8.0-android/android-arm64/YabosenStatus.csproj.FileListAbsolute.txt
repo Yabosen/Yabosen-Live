@@ -1,5 +1,0 @@
-C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\obj\Debug\net8.0-android\android-arm64\YabosenStatus.csproj.AssemblyReference.cache
-C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\obj\Debug\net8.0-android\android-arm64\YabosenStatus.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\obj\Debug\net8.0-android\android-arm64\YabosenStatus.AssemblyInfoInputs.cache
-C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\obj\Debug\net8.0-android\android-arm64\YabosenStatus.AssemblyInfo.cs
-C:\Users\razva\Documents\GitHub\SWCI\YabosenStatus\obj\Debug\net8.0-android\android-arm64\YabosenStatus.csproj.CoreCompileInputs.cache
