@@ -22,27 +22,49 @@ export default function Home() {
     <>
       <RickRollEasterEgg />
       <HiddenCredits />
-      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-8">
-        <div className="w-full max-w-3xl mx-auto">
+      <main className="min-h-screen bg-background flex flex-col items-center">
+        {/* Full-width Banner Section */}
+        <div className="w-full h-48 sm:h-64 lg:h-80 relative overflow-hidden border-b border-border/10">
+          <div 
+            className="absolute inset-0 w-full h-full transform hover:scale-105 transition-transform duration-1000 ease-out"
+            style={{
+              backgroundImage: "url('/My_Lord.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center 30%",
+            }}
+          />
+          {/* Premium gradient overlays for blending */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
+        </div>
+
+        <div className="w-full max-w-3xl mx-auto px-4 sm:px-8 -mt-20 sm:-mt-24 relative z-10 pb-12">
           {/* Profile Header Section */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-12">
-            {/* Animated Avatar - now fetches from API */}
-            <AnimatedAvatar
-              src="/api/avatar"
-              alt={siteConfig.name}
-              size={140}
-            />
+            {/* Animated Avatar - wrapped in a premium card-like container */}
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-purple-500/50 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-500"></div>
+              <div className="relative p-1.5 bg-background rounded-full border border-white/10 shadow-2xl">
+                <AnimatedAvatar
+                  src="/api/avatar"
+                  alt={siteConfig.name}
+                  size={140}
+                />
+              </div>
+            </div>
 
             {/* Name and Description */}
-            <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-2">
+            <div className="flex flex-col items-center sm:items-start text-center sm:text-left sm:pt-4">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-2 drop-shadow-sm">
                 {siteConfig.name}
               </h1>
               <p className="text-muted-foreground text-sm sm:text-base mb-3 max-w-md">
                 {siteConfig.bio}
               </p>
               <StatusIndicator />
-              <FaceitWidget />
+              <div className="mt-2 w-full flex justify-center sm:justify-start">
+                <FaceitWidget />
+              </div>
             </div>
           </div>
 
