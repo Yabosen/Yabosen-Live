@@ -6,6 +6,7 @@ import { LastFmWidget } from "@/components/lastfm-widget"
 import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
 import { HiddenCredits } from "@/components/hidden-credits"
 import { FaceitWidget } from "@/components/faceit-widget"
+import { CS2WingmanWidget } from "@/components/cs2-wingman-widget"
 import {
   TwitchIcon,
   Youtube,
@@ -62,8 +63,9 @@ export default function Home() {
                 {siteConfig.bio}
               </p>
               <StatusIndicator />
-              <div className="mt-2 w-full flex justify-center sm:justify-start">
+              <div className="mt-2 w-full flex flex-wrap justify-center sm:justify-start gap-4">
                 <FaceitWidget />
+                <CS2WingmanWidget />
               </div>
             </div>
           </div>
