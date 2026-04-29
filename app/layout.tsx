@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { siteConfig } from "@/lib/config"
 import { Suspense } from "react"
-
+import { BirthdayEvent } from "@/components/birthday-event"
 
 export const viewport: Viewport = {
   themeColor: '#7c3aed',
@@ -46,6 +46,7 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
 
+        <BirthdayEvent />
         <Analytics />
       </body>
     </html>

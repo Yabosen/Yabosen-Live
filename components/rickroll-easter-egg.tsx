@@ -101,12 +101,26 @@ export function RickRollEasterEgg() {
       // If we've reached 5 presses, play the song
       if (newCount >= 5 && !hasPlayed.current) {
         hasPlayed.current = true
-        playYouTubeVideo("4D9w9K2SXiM", 190000) // 3.5 minutes
+        
+        // Check if it's Yabosen's birthday (April 30th UTC+3)
+        const nowUTC3 = new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 3));
+        const isBirthday = nowUTC3.getMonth() === 3 && nowUTC3.getDate() === 30;
 
-        setTimeout(() => {
-          hasPlayed.current = false
-          setSpaceCount(0)
-        }, 190000)
+        if (isBirthday) {
+          // Play a Happy Birthday song (The Minions Happy Birthday or generic)
+          playYouTubeVideo("nlYlCE2Vs-Y", 120000) // 2 minutes
+          setTimeout(() => {
+            hasPlayed.current = false
+            setSpaceCount(0)
+          }, 120000)
+        } else {
+          // Play the default song
+          playYouTubeVideo("4D9w9K2SXiM", 190000) // 3.5 minutes
+          setTimeout(() => {
+            hasPlayed.current = false
+            setSpaceCount(0)
+          }, 190000)
+        }
       }
     }
 
