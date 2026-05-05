@@ -76,7 +76,7 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <LinkCard
                 name="Twitch"
-                url="https://www.twitch.tv/yab0sen"
+                url="https://www.twitch.tv/yabosenlikewhy"
                 icon={<TwitchIcon className="h-8 w-8" />}
               />
               <LinkCard
