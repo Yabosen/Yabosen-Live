@@ -91,7 +91,7 @@ export default function Home() {
               />
               <LinkCard
                 name="TikTok"
-                url="https://www.tiktok.com/@yabosen56"
+                url="https://www.tiktok.com/@yabosenlikewhy"
                 icon={<Music className="h-8 w-8" />}
               />
             </div>
