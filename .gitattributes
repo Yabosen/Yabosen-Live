@@ -1,3 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 *.tsx linguist-language=html
+*.ts linguist-language=html
+*.js linguist-language=html
