@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Redis } from '@upstash/redis'
+import type { SleepSchedule } from '../sleep-schedule/route'
+import { SCHEDULE_KEY } from '../sleep-schedule/route'
 
 export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
 export type ActivityType = 'playing' | 'watching' | 'listening' | null
@@ -98,23 +100,68 @@ export const dynamic = 'force-dynamic'
 // resilient to one missed/delayed beat (e.g. Android Doze).
 const STALENESS_THRESHOLD_MS = 3 * 60 * 1000
 
+// Schedule eval — uses Europe/Bucharest local time so DST is handled
+// automatically (GMT+3 in summer, GMT+2 in winter).
+function bucharestMinutes(now: number): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Bucharest',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(new Date(now))
+  const h = parseInt(parts.find(p => p.type === 'hour')!.value, 10)
+  const m = parseInt(parts.find(p => p.type === 'minute')!.value, 10)
+  return h * 60 + m
+}
+
+function inSleepWindow(now: number, sleepy: string, wakey: string): boolean {
+  const cur = bucharestMinutes(now)
+  const [sh, sm] = sleepy.split(':').map(Number)
+  const [wh, wm] = wakey.split(':').map(Number)
+  const sleepyMin = sh * 60 + sm
+  const wakeyMin = wh * 60 + wm
+  if (sleepyMin <= wakeyMin) {
+    // same-day window (rare — e.g. afternoon nap 13:00–15:00)
+    return cur >= sleepyMin && cur < wakeyMin
+  }
+  // overnight window — e.g. 23:00 → 07:00
+  return cur >= sleepyMin || cur < wakeyMin
+}
+
 // GET - Public: Fetch current status
 // Pass ?debug=1 to also see raw heartbeat ages (for diagnosing idle-override issues)
 export async function GET(request: Request) {
   try {
     const redis = getRedisClient()
-    const status = await readStatus()
+    let status = await readStatus()
     const debug = new URL(request.url).searchParams.get('debug') === '1'
 
     // Check per-source heartbeat freshness up-front so debug always returns it
-    const [pcHeartbeat, mobileHeartbeat] = await Promise.all([
+    const [pcHeartbeat, mobileHeartbeat, schedule] = await Promise.all([
       redis.get<number>('yabosen:heartbeat:pc'),
       redis.get<number>('yabosen:heartbeat:mobile'),
+      redis.get<SleepSchedule>(SCHEDULE_KEY),
     ])
 
     const now = Date.now()
     const pcAlive = pcHeartbeat != null && (now - pcHeartbeat) < STALENESS_THRESHOLD_MS
     const mobileAlive = mobileHeartbeat != null && (now - mobileHeartbeat) < STALENESS_THRESHOLD_MS
+
+    // Sleep schedule: lazily flip stored status based on the time-of-day window.
+    //   - Auto-Sleep at sleepyTime: only if PC is not alive AND status is in
+    //     {online, idle} (i.e., user hasn't manually picked DND/Streaming/Offline/etc).
+    //   - Auto-Wake at wakeyTime: if status is sleeping, revert to online.
+    // Writes are idempotent — only happen when the resulting status would change.
+    if (schedule?.enabled) {
+      const inWindow = inSleepWindow(now, schedule.sleepyTime, schedule.wakeyTime)
+      if (inWindow && !pcAlive && (status.status === 'online' || status.status === 'idle')) {
+        const flipped: StatusData = { ...status, status: 'sleeping', updatedAt: now }
+        await writeStatus(flipped)
+        status = flipped
+      } else if (!inWindow && status.status === 'sleeping') {
+        const flipped: StatusData = { ...status, status: 'online', updatedAt: now }
+        await writeStatus(flipped)
+        status = flipped
+      }
+    }
 
     const debugInfo = debug ? {
       _debug: {
