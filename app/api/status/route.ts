@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { Redis } from '@upstash/redis'
 
 export type StatusType = 'online' | 'offline' | 'dnd' | 'idle' | 'sleeping' | 'streaming'
-export type ActivityType = 'playing' | 'watching' | null
+export type ActivityType = 'playing' | 'watching' | 'listening' | null
 
 interface StatusData {
   status: StatusType
@@ -93,21 +93,20 @@ async function writeStatus(data: StatusData): Promise<void> {
 
 export const dynamic = 'force-dynamic'
 
-// Staleness threshold: 2 minutes (in milliseconds)
-const STALENESS_THRESHOLD_MS = 2 * 60 * 1000
+// Staleness threshold: 3 minutes (in milliseconds).
+// Heartbeat interval is 60s, so this gives ~3 attempts before flipping —
+// resilient to one missed/delayed beat (e.g. Android Doze).
+const STALENESS_THRESHOLD_MS = 3 * 60 * 1000
 
 // GET - Public: Fetch current status
-export async function GET() {
+// Pass ?debug=1 to also see raw heartbeat ages (for diagnosing idle-override issues)
+export async function GET(request: Request) {
   try {
     const redis = getRedisClient()
     const status = await readStatus()
+    const debug = new URL(request.url).searchParams.get('debug') === '1'
 
-    // If status is offline or sleeping, skip staleness logic
-    if (status.status === 'offline' || status.status === 'sleeping') {
-      return NextResponse.json(status)
-    }
-
-    // Check per-source heartbeat freshness
+    // Check per-source heartbeat freshness up-front so debug always returns it
     const [pcHeartbeat, mobileHeartbeat] = await Promise.all([
       redis.get<number>('yabosen:heartbeat:pc'),
       redis.get<number>('yabosen:heartbeat:mobile'),
@@ -117,9 +116,28 @@ export async function GET() {
     const pcAlive = pcHeartbeat != null && (now - pcHeartbeat) < STALENESS_THRESHOLD_MS
     const mobileAlive = mobileHeartbeat != null && (now - mobileHeartbeat) < STALENESS_THRESHOLD_MS
 
+    const debugInfo = debug ? {
+      _debug: {
+        storedStatus: status.status,
+        pcHeartbeatTs: pcHeartbeat,
+        pcHeartbeatAgeMs: pcHeartbeat != null ? now - pcHeartbeat : null,
+        pcAlive,
+        mobileHeartbeatTs: mobileHeartbeat,
+        mobileHeartbeatAgeMs: mobileHeartbeat != null ? now - mobileHeartbeat : null,
+        mobileAlive,
+        stalenessThresholdMs: STALENESS_THRESHOLD_MS,
+        now,
+      }
+    } : {}
+
+    // If status is offline or sleeping, skip staleness logic
+    if (status.status === 'offline' || status.status === 'sleeping') {
+      return NextResponse.json({ ...status, ...debugInfo })
+    }
+
     // PC alive → keep current status (Online, DND, etc.)
     if (pcAlive) {
-      return NextResponse.json(status)
+      return NextResponse.json({ ...status, ...debugInfo })
     }
 
     // PC stale but mobile alive → show idle
@@ -127,12 +145,12 @@ export async function GET() {
       return NextResponse.json({
         ...status,
         status: 'idle' as StatusType,
+        ...debugInfo,
       })
     }
 
     // Both stale → offline
     if (!pcAlive && !mobileAlive) {
-      // Also fall back to staleness on updatedAt for backwards compatibility
       if (Date.now() - status.updatedAt > STALENESS_THRESHOLD_MS) {
         return NextResponse.json({
           ...status,
@@ -141,11 +159,12 @@ export async function GET() {
           activityName: null,
           episodeInfo: null,
           seasonInfo: null,
+          ...debugInfo,
         })
       }
     }
 
-    return NextResponse.json(status)
+    return NextResponse.json({ ...status, ...debugInfo })
   } catch (error) {
     console.error('Failed to fetch status:', error)
     return NextResponse.json(
@@ -201,10 +220,10 @@ export async function POST(request: Request) {
     }
 
     // Validate activity type if provided
-    if (activityType && activityType !== 'playing' && activityType !== 'watching') {
+    if (activityType && activityType !== 'playing' && activityType !== 'watching' && activityType !== 'listening') {
       console.log(`❌ Invalid activity type: ${activityType}`)
       return NextResponse.json(
-        { error: 'Invalid activity type. Must be "playing" or "watching"' },
+        { error: 'Invalid activity type. Must be "playing", "watching", or "listening"' },
         { status: 400 }
       )
     }
