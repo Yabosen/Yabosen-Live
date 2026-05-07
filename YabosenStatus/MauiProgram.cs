@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Logging;
 using YabosenStatus.Services;
+#if WINDOWS
+using H.NotifyIcon;
+#endif
 
 namespace YabosenStatus;
 
@@ -12,6 +15,11 @@ public static class MauiProgram
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>();
+
+#if WINDOWS
+            // Tray icon support — required for the <tb:TaskbarIcon> in MainPage.xaml
+            builder.UseNotifyIcon();
+#endif
 
             // Register services
             builder.Services.AddSingleton<StatusService>();

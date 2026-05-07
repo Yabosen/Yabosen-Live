@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-windows10.0.19041.0</TargetFrameworks>
-		<OutputType Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">WinExe</OutputType>
-		<OutputType Condition="'$(TargetFramework)' != 'net8.0-windows10.0.19041.0'">Exe</OutputType>
+		<TargetFrameworks>net9.0-android;net9.0-windows10.0.19041.0</TargetFrameworks>
+		<OutputType Condition="'$(TargetFramework)' == 'net9.0-windows10.0.19041.0'">WinExe</OutputType>
+		<OutputType Condition="'$(TargetFramework)' != 'net9.0-windows10.0.19041.0'">Library</OutputType>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- WinRT.SourceGenerator emits unsafe code; required for the H.NotifyIcon Windows path -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AndroidSdkDirectory>C:\Users\razva\AppData\Local\Android\Sdk</AndroidSdkDirectory>
 		<JavaSdkDirectory>C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot</JavaSdkDirectory>
 
@@ -30,34 +32,63 @@
 
     <!-- Android specific -->
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-    <!-- Prefer a single RID for Release builds (Play Store requires 64-bit) -->
     <RuntimeIdentifier Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' AND '$(Configuration)' == 'Release'">android-arm64</RuntimeIdentifier>
+    <!-- When targeting Android, this project is a class library consumed by YabosenStatus.Android -->
+    <AndroidGenerateResourceDesigner Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">false</AndroidGenerateResourceDesigner>
   </PropertyGroup>
+
+  <!-- Exclude Android entry-point files so they don't conflict with YabosenStatus.Android -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <Compile Remove="Platforms\Android\MainActivity.cs" />
+    <Compile Remove="Platforms\Android\MainApplication.cs" />
+    <AndroidResource Remove="Platforms\Android\**\*" />
+  </ItemGroup>
+
+  <!-- Windows-only files: tray icon, Discord RPC, process monitor, etc. -->
+  <!-- Excluded for Android because they reference Win32 APIs and Windows-only NuGets -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <Compile Remove="App.xaml.cs" />
+    <Compile Remove="MainPage.xaml.cs" />
+    <Compile Remove="MauiProgram.cs" />
+    <Compile Remove="Services\DiscordRpcService.cs" />
+    <Compile Remove="Services\LastFmService.cs" />
+    <Compile Remove="Services\ProcessMonitorService.cs" />
+    <Compile Remove="Services\SteamService.cs" />
+    <MauiXaml Remove="App.xaml" />
+    <MauiXaml Remove="MainPage.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+    <MauiIcon Update="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
-    <!-- Images - only include if folder has files -->
-    <MauiImage Include="Resources\Images\*" Condition="Exists('Resources\Images')" />
-
-    <!-- Raw Assets - only include if folder has files -->
-    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" Condition="Exists('Resources\Raw')" />
-
-    <!-- Fonts - only include if folder has files -->
-    <MauiFont Include="Resources\Fonts\*" Condition="Exists('Resources\Fonts')" />
+    <MauiSplashScreen Update="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.91" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.91" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
   </ItemGroup>
 
+  <!-- Windows-only NuGets — Discord Rich Presence + tray icon -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+    <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
+    <PackageReference Include="H.NotifyIcon.Maui" Version="2.1.2" />
+  </ItemGroup>
+
+  <!-- Ship appicon.ico next to the exe so the tray icon resolves at runtime -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+    <Content Include="Resources\AppIcon\appicon.ico" CopyToOutputDirectory="PreserveNewest" Link="appicon.ico" />
+  </ItemGroup>
+
   <Target Name="Install" DependsOnTargets="Build" />
+
+  <!-- Delete the corrupt .aar placeholder that MAUI generates for Android library builds -->
+  <Target Name="_CleanCorruptAar" AfterTargets="Build" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <Delete Files="$(OutputPath)$(AssemblyName).aar" Condition="Exists('$(OutputPath)$(AssemblyName).aar')" />
+  </Target>
 
 </Project>

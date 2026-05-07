@@ -20,7 +20,8 @@ public enum ActivityType
 {
     None,
     Playing,
-    Watching
+    Watching,
+    Listening
 }
 
 /// <summary>
@@ -112,6 +113,7 @@ public static class ActivityTypeExtensions
     {
         ActivityType.Playing => "playing",
         ActivityType.Watching => "watching",
+        ActivityType.Listening => "listening",
         ActivityType.None => null!,
         _ => null!
     };
@@ -120,6 +122,7 @@ public static class ActivityTypeExtensions
     {
         "playing" => ActivityType.Playing,
         "watching" => ActivityType.Watching,
+        "listening" => ActivityType.Listening,
         _ => ActivityType.None
     };
 }

@@ -38,7 +38,12 @@ public class StatusService
         }
         catch (Exception)
         {
-            // SecureStorage might not be available on all platforms
+            _password = null;
+        }
+
+        // If SecureStorage was empty or threw, fall back to Preferences
+        if (string.IsNullOrEmpty(_password))
+        {
             _password = Preferences.Get(PASSWORD_STORAGE_KEY, string.Empty);
         }
     }
@@ -54,14 +59,19 @@ public class StatusService
     public async Task SetPasswordAsync(string password)
     {
         _password = password;
+
+        // Always mirror into Preferences — the Android foreground service
+        // can read SharedPreferences without the MAUI main thread, while
+        // SecureStorage requires it and is unreliable after OS restarts.
+        try { Preferences.Set(PASSWORD_STORAGE_KEY, password); } catch { }
+
         try
         {
             await SecureStorage.SetAsync(PASSWORD_STORAGE_KEY, password);
         }
         catch (Exception)
         {
-            // Fallback to Preferences if SecureStorage unavailable
-            Preferences.Set(PASSWORD_STORAGE_KEY, password);
+            // SecureStorage unavailable — Preferences copy above is the fallback
         }
     }
 
@@ -171,7 +181,7 @@ public class StatusService
     public void ClearPassword()
     {
         _password = null;
-        SecureStorage.Remove(PASSWORD_STORAGE_KEY);
-        Preferences.Remove(PASSWORD_STORAGE_KEY);
+        try { SecureStorage.Remove(PASSWORD_STORAGE_KEY); } catch { }
+        try { Preferences.Remove(PASSWORD_STORAGE_KEY); } catch { }
     }
 }
