@@ -85,7 +85,7 @@ export default function SocialsPage() {
         <div className="w-full flex flex-col items-center space-y-4">
           <SocialLink
             name="Twitch"
-            url="https://www.twitch.tv/yab0sen"
+            url="https://www.twitch.tv/yabosenlikewhy"
             icon={<Twitch className="h-6 w-6" />}
           />
           <SocialLink
@@ -100,7 +100,7 @@ export default function SocialsPage() {
           />
           <SocialLink
             name="TikTok"
-            url="https://www.tiktok.com/@yabosen56"
+            url="https://www.tiktok.com/@yabosenlikewhy"
             icon={<Music className="h-6 w-6" />}
           />
           <SocialLink
@@ -120,7 +120,7 @@ export default function SocialsPage() {
           />
           <SocialLink
             name="Last.fm"
-            url="https://www.last.fm/user/LutyLutanu606"
+            url="https://www.last.fm/user/Yabosen"
             icon={<Disc3 className="h-6 w-6" />}
           />
           <SocialLink
