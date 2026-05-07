@@ -135,36 +135,23 @@ export async function GET(request: Request) {
       return NextResponse.json({ ...status, ...debugInfo })
     }
 
-    // PC alive → keep current status (Online, DND, etc.)
+    // PC alive → keep current status (Online, DND, Streaming, etc.)
     if (pcAlive) {
       return NextResponse.json({ ...status, ...debugInfo })
     }
 
-    // PC stale but mobile alive → show idle
-    if (!pcAlive && mobileAlive) {
-      return NextResponse.json({
-        ...status,
-        status: 'idle' as StatusType,
-        ...debugInfo,
-      })
-    }
-
-    // Both stale → offline
-    if (!pcAlive && !mobileAlive) {
-      if (Date.now() - status.updatedAt > STALENESS_THRESHOLD_MS) {
-        return NextResponse.json({
-          ...status,
-          status: 'offline' as StatusType,
-          activityType: null,
-          activityName: null,
-          episodeInfo: null,
-          seasonInfo: null,
-          ...debugInfo,
-        })
-      }
-    }
-
-    return NextResponse.json({ ...status, ...debugInfo })
+    // PC stale → idle override, regardless of phone. Activity fields are
+    // dropped because "idle but still streaming X" is nonsense. To go to
+    // offline, the user must manually click it (it short-circuits above).
+    return NextResponse.json({
+      ...status,
+      status: 'idle' as StatusType,
+      activityType: null,
+      activityName: null,
+      episodeInfo: null,
+      seasonInfo: null,
+      ...debugInfo,
+    })
   } catch (error) {
     console.error('Failed to fetch status:', error)
     return NextResponse.json(
