@@ -46,7 +46,7 @@ export const siteConfig = {
   featuredSocialLinks: [
     {
       name: "Twitch",
-      url: "https://www.twitch.tv/yabosenlikewhy",
+      url: "https://www.twitch.tv/yab0sen",
       icon: "twitch",
     },
     {
@@ -56,12 +56,12 @@ export const siteConfig = {
     },
     {
       name: "Instagram",
-      url: "https://www.instagram.com/yabosenlikewhy/",
+      url: "https://www.instagram.com/yabosenfps/",
       icon: "instagram",
     },
     {
       name: "TikTok",
-      url: "https://www.tiktok.com/@yabosenlikewhy",
+      url: "https://www.tiktok.com/@yabosen56",
       icon: "tiktok",
     },
     {
@@ -78,7 +78,7 @@ export const siteConfig = {
 
   // Other Social Links (displayed as icon grid)
   socialLinks: [
-    { name: "Twitter/X", url: "https://x.com/YaboSenLikeWhy", icon: "twitter" },
+    { name: "Twitter/X", url: "https://x.com/Yabosen56", icon: "twitter" },
     { name: "Twitter/X Alt", url: "https://x.com/N3XTSLVT", icon: "twitter" },
     { name: "Discord Server", url: "https://pastebin.com/XrEA6b70", icon: "discord" },
     { name: "TikTok", url: "https://www.tiktok.com/@yabosen56", icon: "tiktok" },
