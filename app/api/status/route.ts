@@ -174,6 +174,11 @@ export async function GET(request: Request) {
         mobileAlive,
         stalenessThresholdMs: STALENESS_THRESHOLD_MS,
         now,
+        bucharestNowMin: bucharestMinutes(now),
+        schedule,
+        inSleepWindow: schedule?.enabled
+          ? inSleepWindow(now, schedule.sleepyTime, schedule.wakeyTime)
+          : null,
       }
     } : {}
 
