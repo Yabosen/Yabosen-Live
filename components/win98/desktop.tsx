@@ -55,7 +55,7 @@ const APPS: Record<AppId, AppDef> = {
   about: { title: `About ${siteConfig.name}`, icon: (s) => <ComputerIcon size={s} />, width: 400 },
   links: { title: "Links", icon: (s) => <FolderIcon size={s} />, width: 440, flush: true, menu: EXPLORER_MENU },
   music: { title: "Now Playing", icon: (s) => <CdIcon size={s} />, width: 340 },
-  cs: { title: "CS Stats", icon: (s) => <CrosshairIcon size={s} />, width: 340 },
+  cs: { title: "CS Stats", icon: (s) => <CrosshairIcon size={s} />, width: 360 },
   recycle: { title: "Recycle Bin", icon: (s) => <RecycleBinIcon size={s} />, width: 380, flush: true, menu: EXPLORER_MENU },
   credits: { title: "Credits", icon: (s) => <InfoIcon size={s} />, width: 300, dialog: true },
   shutdown: { title: "Shut Down Windows", icon: (s) => <ShutdownIcon size={s} />, width: 340, dialog: true },
@@ -111,7 +111,8 @@ function initialLayout({ w, h }: Bounds): Win[] {
   const aboutW = APPS.about.width
   const sideW = APPS.music.width
   if (w >= ICON_COLUMN + aboutW + gap + sideW + gap) {
-    const left = Math.max(ICON_COLUMN, Math.round((w - aboutW - gap - sideW) / 2))
+    // Hug the left so the wallpaper's subject on the right stays visible.
+    const left = ICON_COLUMN + gap
     const right = left + aboutW + gap
     const wins = [makeWin("about", left, 24, 3), makeWin("music", right, 24, 2)]
     if (h >= 560) wins.push(makeWin("cs", right, 250, 1))

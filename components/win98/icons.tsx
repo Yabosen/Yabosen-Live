@@ -267,7 +267,7 @@ export function StartLogo() {
       <path d="M2 2h6v5H1V3h1z" fill="#7c3aed" />
       <path d="M9 1h6v1h2v5H9z" fill="#ec4899" />
       <path d="M1 8h7v6H2v-1H1z" fill="#a78bfa" />
-      <path d="M9 8h8v5h-1v1H9z" fill="#1a1a1a" />
+      <path d="M9 8h8v5h-1v1H9z" fill="#e8defa" />
     </svg>
   )
 }
@@ -277,7 +277,7 @@ export function StartLogo() {
 export function MinimizeGlyph() {
   return (
     <svg width="8" height="7" viewBox="0 0 8 7" shapeRendering="crispEdges" aria-hidden="true">
-      <rect x="1" y="5" width="6" height="2" fill="#000" />
+      <rect x="1" y="5" width="6" height="2" fill="currentColor" />
     </svg>
   )
 }
@@ -285,7 +285,7 @@ export function MinimizeGlyph() {
 export function MaximizeGlyph() {
   return (
     <svg width="9" height="9" viewBox="0 0 9 9" shapeRendering="crispEdges" aria-hidden="true">
-      <path d="M0 0h9v9H0zM1 2v6h7V2z" fill="#000" fillRule="evenodd" />
+      <path d="M0 0h9v9H0zM1 2v6h7V2z" fill="currentColor" fillRule="evenodd" />
     </svg>
   )
 }
@@ -293,8 +293,8 @@ export function MaximizeGlyph() {
 export function RestoreGlyph() {
   return (
     <svg width="8" height="9" viewBox="0 0 8 9" shapeRendering="crispEdges" aria-hidden="true">
-      <path d="M2 0h6v6H7V2H2z" fill="#000" />
-      <path d="M0 3h6v6H0zM1 5v3h4V5z" fill="#000" fillRule="evenodd" />
+      <path d="M2 0h6v6H7V2H2z" fill="currentColor" />
+      <path d="M0 3h6v6H0zM1 5v3h4V5z" fill="currentColor" fillRule="evenodd" />
     </svg>
   )
 }
@@ -304,7 +304,7 @@ export function CloseGlyph() {
     <svg width="8" height="7" viewBox="0 0 8 7" shapeRendering="crispEdges" aria-hidden="true">
       <path
         d="M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0z"
-        fill="#000"
+        fill="currentColor"
       />
     </svg>
   )
@@ -313,11 +313,11 @@ export function CloseGlyph() {
 export function SpeakerIcon() {
   return (
     <svg className="pixel" width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true">
-      <path d="M2 5h3l4-4h1v14H9l-4-4H2z" fill="#000" />
+      <path d="M2 5h3l4-4h1v14H9l-4-4H2z" fill="currentColor" />
       <path d="M3 6h2v4H3z" fill="#ffff00" />
       <path d="M6 6l3-3v10l-3-3z" fill="#808080" />
-      <rect x="12" y="5" width="1" height="6" fill="#000" />
-      <rect x="14" y="3" width="1" height="10" fill="#000" />
+      <rect x="12" y="5" width="1" height="6" fill="currentColor" />
+      <rect x="14" y="3" width="1" height="10" fill="currentColor" />
     </svg>
   )
 }

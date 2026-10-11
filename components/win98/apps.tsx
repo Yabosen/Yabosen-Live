@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { siteConfig } from "@/lib/config"
 import type { StatusType } from "@/lib/hooks/use-custom-status"
+import type { Cs2Ranks } from "@/app/api/cs2/route"
 import { FolderIcon, InfoIcon, LinkFileIcon, RecycleBinIcon, ShutdownIcon } from "./icons"
 
 // ---------- Shared bits ----------
@@ -134,7 +135,7 @@ export function AboutApp({
         <div style={{ minWidth: 0 }}>
           <h1 style={{ margin: "2px 0 4px", fontSize: 22, lineHeight: 1.1, fontWeight: 700 }}>{siteConfig.name}</h1>
           <p style={{ margin: 0 }}>{siteConfig.title}</p>
-          <p style={{ margin: "6px 0 0", color: "#404040" }}>{siteConfig.bio}</p>
+          <p style={{ margin: "6px 0 0", color: "var(--w98-muted)" }}>{siteConfig.bio}</p>
         </div>
       </div>
 
@@ -155,7 +156,7 @@ export function AboutApp({
             </div>
             {headline !== style.label && <div style={{ marginTop: 4 }}>{headline}</div>}
             {activity && status.customMessage && (
-              <div style={{ marginTop: 2, color: "#404040" }}>&ldquo;{status.customMessage}&rdquo;</div>
+              <div style={{ marginTop: 2, color: "var(--w98-muted)" }}>&ldquo;{status.customMessage}&rdquo;</div>
             )}
           </>
         )}
@@ -225,7 +226,7 @@ function Explorer({ path, icon, items, empty }: { path: string; icon: ReactNode;
       </div>
       <div className="w98-explorer-view" onClick={(e) => e.target === e.currentTarget && setSelected(null)}>
         {items.length === 0 && (
-          <p style={{ margin: "auto", color: "#808080" }}>{empty}</p>
+          <p style={{ margin: "auto", color: "var(--w98-muted)" }}>{empty}</p>
         )}
         {items.map((item) => (
           <a
@@ -307,12 +308,12 @@ export function MusicApp({ lastfm, loading }: { lastfm: LastFmInfo; loading: boo
       </div>
 
       <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
-        <div className="w98-sunken" style={{ width: 68, height: 68, flexShrink: 0, display: "grid", placeItems: "center", background: "#000" }}>
+        <div className="w98-sunken" style={{ width: 68, height: 68, flexShrink: 0, display: "grid", placeItems: "center", background: "#07050a" }}>
           {track?.albumArt ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={track.albumArt} alt={track.album || track.name} width={64} height={64} style={{ display: "block", objectFit: "cover" }} />
           ) : (
-            <span style={{ color: "#00e000", fontSize: 26 }} aria-hidden="true">&#9835;</span>
+            <span style={{ color: "var(--w98-lcd)", fontSize: 26 }} aria-hidden="true">&#9835;</span>
           )}
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -320,7 +321,7 @@ export function MusicApp({ lastfm, loading }: { lastfm: LastFmInfo; loading: boo
             {track?.name ?? "\u2014"}
           </div>
           <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{track?.artist ?? ""}</div>
-          <div style={{ color: "#404040", marginTop: 2 }}>{playing ? "Scrobbling now" : track ? "Last played" : ""}</div>
+          <div style={{ color: "var(--w98-muted)", marginTop: 2 }}>{playing ? "Scrobbling now" : track ? "Last played" : ""}</div>
         </div>
       </div>
 
@@ -351,53 +352,207 @@ function faceitColor(level: number) {
   return { bg: "#eeeeee", fg: "#000" }
 }
 
-export function CsApp() {
-  const [data, setData] = useState<FaceitData | null>(null)
-  const [state, setState] = useState<"loading" | "ok" | "error">("loading")
+const CS_REFRESH_MS = 5 * 60_000
+
+// CS2 Competitive / Wingman skill groups, indexed by Valve's rank number.
+const SKILL_GROUPS: { name: string; short: string }[] = [
+  { name: "Unranked", short: "—" },
+  { name: "Silver I", short: "S1" },
+  { name: "Silver II", short: "S2" },
+  { name: "Silver III", short: "S3" },
+  { name: "Silver IV", short: "S4" },
+  { name: "Silver Elite", short: "SE" },
+  { name: "Silver Elite Master", short: "SEM" },
+  { name: "Gold Nova I", short: "GN1" },
+  { name: "Gold Nova II", short: "GN2" },
+  { name: "Gold Nova III", short: "GN3" },
+  { name: "Gold Nova Master", short: "GNM" },
+  { name: "Master Guardian I", short: "MG1" },
+  { name: "Master Guardian II", short: "MG2" },
+  { name: "Master Guardian Elite", short: "MGE" },
+  { name: "Distinguished Master Guardian", short: "DMG" },
+  { name: "Legendary Eagle", short: "LE" },
+  { name: "Legendary Eagle Master", short: "LEM" },
+  { name: "Supreme Master First Class", short: "SMFC" },
+  { name: "Global Elite", short: "GE" },
+]
+
+function skillGroupColor(rank: number) {
+  if (rank >= 18) return { bg: "#7a0000", fg: "#ffd700" }
+  if (rank >= 17) return { bg: "#b91c1c", fg: "#fff" }
+  if (rank >= 15) return { bg: "#6d4fb3", fg: "#fff" }
+  if (rank >= 11) return { bg: "#2f6fb5", fg: "#fff" }
+  if (rank >= 7) return { bg: "#e6b422", fg: "#000" }
+  if (rank >= 1) return { bg: "#b8c4cc", fg: "#000" }
+  return { bg: "#808080", fg: "#fff" }
+}
+
+// CS Rating colour bands used by Premier.
+function premierColor(rating: number) {
+  if (rating >= 30000) return "#ffd700"
+  if (rating >= 25000) return "#eb4b4b"
+  if (rating >= 20000) return "#f03cff"
+  if (rating >= 15000) return "#c166ff"
+  if (rating >= 10000) return "#6a7dff"
+  if (rating >= 5000) return "#8cc6ff"
+  return "#b0c3d9"
+}
+
+function mapName(id: string) {
+  if (id === "de_dust2") return "Dust II"
+  const bare = id.replace(/^(de|cs|ar)_/, "")
+  return bare.charAt(0).toUpperCase() + bare.slice(1)
+}
+
+function timeAgo(iso: string) {
+  const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
+  if (mins < 60) return `${mins} min ago`
+  const hours = Math.round(mins / 60)
+  if (hours < 48) return `${hours} hour${hours === 1 ? "" : "s"} ago`
+  return `${Math.round(hours / 24)} days ago`
+}
+
+/** Fetches JSON now and every `intervalMs`, keeping the last good result on errors. */
+function usePolledJson<T>(url: string, intervalMs: number) {
+  const [data, setData] = useState<T | null>(null)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    fetch("/api/faceit")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((json: FaceitData) => {
-        if (cancelled) return
-        setData(json)
-        setState("ok")
-      })
-      .catch(() => !cancelled && setState("error"))
+    const load = () =>
+      fetch(url)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((json: T) => {
+          if (cancelled) return
+          setData(json)
+          setFailed(false)
+        })
+        .catch(() => !cancelled && setFailed(true))
+    load()
+    const id = setInterval(load, intervalMs)
     return () => {
       cancelled = true
+      clearInterval(id)
     }
-  }, [])
+  }, [url, intervalMs])
+
+  return { data, loading: !data && !failed, failed: !data && failed }
+}
+
+function SkillGroupBadge({ rank }: { rank: number }) {
+  const group = SKILL_GROUPS[rank] ?? SKILL_GROUPS[0]
+  const color = skillGroupColor(rank)
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+      <span className="w98-rank" style={{ background: color.bg, color: color.fg }}>
+        {group.short}
+      </span>
+      {group.name}
+    </span>
+  )
+}
+
+function PremierPlate({ rating }: { rating: number | null }) {
+  if (!rating) return <span style={{ color: "var(--w98-muted)" }}>Unranked this season</span>
+  const [thousands, rest] = rating.toLocaleString("en-US").split(/,(?=\d{3}$)/)
+  return (
+    <span className="w98-premier" style={{ color: premierColor(rating), borderColor: premierColor(rating) }}>
+      <span>
+        <b>{rest ? thousands : rating}</b>
+        {rest && <small>,{rest}</small>}
+      </span>
+    </span>
+  )
+}
+
+export function CsApp() {
+  const faceitLive = usePolledJson<FaceitData>("/api/faceit", CS_REFRESH_MS)
+  const cs2 = usePolledJson<Cs2Ranks>("/api/cs2", CS_REFRESH_MS)
+
+  // FACEIT's own API is the freshest; Leetify's copy is the fallback.
+  const faceit: FaceitData | null =
+    faceitLive.data ??
+    (cs2.data?.faceit?.elo ? { nickname: siteConfig.name, level: cs2.data.faceit.level, elo: cs2.data.faceit.elo } : null)
 
   let progress = 1
   let toNext: string | null = null
-  if (data && data.level < 10) {
-    const min = FACEIT_LEVEL_MIN[data.level - 1] ?? 0
-    const next = FACEIT_LEVEL_MIN[data.level] ?? min
-    progress = Math.min(1, Math.max(0, (data.elo - min) / Math.max(1, next - min)))
-    toNext = `${Math.max(0, next - data.elo)} ELO to level ${data.level + 1}`
+  if (faceit && faceit.level < 10) {
+    const min = FACEIT_LEVEL_MIN[faceit.level - 1] ?? 0
+    const next = FACEIT_LEVEL_MIN[faceit.level] ?? min
+    progress = Math.min(1, Math.max(0, (faceit.elo - min) / Math.max(1, next - min)))
+    toNext = `${Math.max(0, next - faceit.elo)} ELO to level ${faceit.level + 1}`
   }
-  const color = faceitColor(data?.level ?? 1)
+  const color = faceitColor(faceit?.level ?? 1)
+  const rating = cs2.data?.leetifyRating
 
   return (
     <div>
       <fieldset className="w98-group" style={{ marginTop: 6 }}>
+        <legend>Matchmaking</legend>
+        {cs2.loading && <span>Connecting to Leetify...</span>}
+        {cs2.failed && <span>Couldn&apos;t reach Leetify right now.</span>}
+        {cs2.data && (
+          <div className="w98-listview">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: "34%" }}>Mode</th>
+                  <th>Rank</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Premier</td>
+                  <td>
+                    <PremierPlate rating={cs2.data.premier} />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Wingman</td>
+                  <td>
+                    {cs2.data.wingman ? <SkillGroupBadge rank={cs2.data.wingman} /> : <span style={{ color: "var(--w98-muted)" }}>Unranked</span>}
+                  </td>
+                </tr>
+                <tr className="sub">
+                  <td colSpan={2}>Competitive</td>
+                </tr>
+                {cs2.data.competitive.length === 0 && (
+                  <tr>
+                    <td colSpan={2} style={{ color: "var(--w98-muted)" }}>
+                      No map ranks yet
+                    </td>
+                  </tr>
+                )}
+                {cs2.data.competitive.map((c) => (
+                  <tr key={c.map}>
+                    <td>{mapName(c.map)}</td>
+                    <td>
+                      <SkillGroupBadge rank={c.rank} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </fieldset>
+
+      <fieldset className="w98-group">
         <legend>FACEIT</legend>
-        {state === "loading" && <span>Connecting to FACEIT...</span>}
-        {state === "error" && <span>Couldn&apos;t reach FACEIT right now.</span>}
-        {state === "ok" && data && (
+        {!faceit && (faceitLive.loading || cs2.loading) && <span>Connecting to FACEIT...</span>}
+        {!faceit && !faceitLive.loading && !cs2.loading && <span>Couldn&apos;t reach FACEIT right now.</span>}
+        {faceit && (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div className="w98-faceit-badge" style={{ background: color.bg, color: color.fg }}>
-                {data.level}
+                {faceit.level}
               </div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
-                  {data.elo} <span style={{ fontSize: 11, fontWeight: 400 }}>ELO</span>
+                  {faceit.elo} <span style={{ fontSize: 11, fontWeight: 400 }}>ELO</span>
                 </div>
                 <div style={{ marginTop: 3 }}>
-                  Level {data.level} &middot; {data.nickname}
+                  Level {faceit.level} &middot; {faceit.nickname}
                 </div>
               </div>
             </div>
@@ -409,23 +564,17 @@ export function CsApp() {
         )}
       </fieldset>
 
-      <fieldset className="w98-group">
-        <legend>CS2 Wingman</legend>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div className="w98-sunken" style={{ background: "#202020", padding: 4, lineHeight: 0 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mg2-icon.png" alt="" width={64} height={26} style={{ objectFit: "contain" }} />
-          </div>
-          <span style={{ fontWeight: 700 }}>Master Guardian II</span>
-        </div>
-      </fieldset>
-
       <ButtonRow>
         <LinkButton href="https://www.faceit.com/en/players/Yabosen">FACEIT</LinkButton>
-        <LinkButton href="https://csstats.gg/player/76561198981651703">CS Stats</LinkButton>
+        <LinkButton href={`https://csstats.gg/player/${siteConfig.csStats.steam64}`}>CS Stats</LinkButton>
         <LinkButton href="https://leetify.com/@yabosen">Leetify</LinkButton>
         <LinkButton href="https://steamcommunity.com/id/Yabosen/">Steam</LinkButton>
       </ButtonRow>
+
+      <div className="w98-statusbar" style={{ marginTop: 8 }}>
+        <span>{rating != null ? `Leetify Rating ${rating >= 0 ? "+" : ""}${rating.toFixed(2)}` : "Leetify Rating —"}</span>
+        <span>{cs2.data?.lastMatchAt ? `Last match ${timeAgo(cs2.data.lastMatchAt)}` : "Data via Leetify"}</span>
+      </div>
     </div>
   )
 }

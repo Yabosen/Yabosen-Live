@@ -18,15 +18,23 @@
 }
 
 .w98 {
-  --w98-desktop: #008080;
-  --w98-face: #c0c0c0;
-  --w98-hilite: #ffffff;
-  --w98-light: #dfdfdf;
-  --w98-shadow: #808080;
-  --w98-dark: #0a0a0a;
-  --w98-navy: #000080;
-  --w98-title: linear-gradient(90deg, #000080, #1084d0);
-  --w98-title-off: linear-gradient(90deg, #808080, #b5b5b5);
+  /* Dark plum scheme with lavender accents */
+  --w98-desktop: #0e0a12;
+  --w98-wallpaper: url("/wallpaper.jpg");
+  --w98-face: #2b2434;
+  --w98-hilite: #7a679a;
+  --w98-light: #4a3e5c;
+  --w98-shadow: #17121d;
+  --w98-dark: #050307;
+  --w98-text: #e8defa;
+  --w98-muted: #a397b8;
+  --w98-field: #16111c;
+  --w98-accent: #b98cff;
+  --w98-select: #7c4dcc;
+  --w98-lcd: #c9a8ff;
+  --w98-title: linear-gradient(90deg, #4b2380, #a77ce8);
+  --w98-title-off: linear-gradient(90deg, #3a3346, #5a5168);
+  --w98-title-off-text: #9a90aa;
   --w98-taskbar-h: 30px;
 
   --w98-raised: inset -1px -1px var(--w98-dark), inset 1px 1px var(--w98-light),
@@ -42,8 +50,10 @@
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: var(--w98-desktop);
-  color: #000;
+  background: var(--w98-desktop) var(--w98-wallpaper) 75% 50% / cover no-repeat;
+  color: var(--w98-text);
+  color-scheme: dark;
+  scrollbar-color: var(--w98-hilite) var(--w98-shadow);
   font-family: "Pixelated MS Sans Serif", "Microsoft Sans Serif", "MS Sans Serif", Tahoma, Arial, sans-serif;
   font-size: 11px;
   line-height: 1.35;
@@ -74,7 +84,7 @@
 }
 
 .w98 :focus-visible {
-  outline: 1px dotted #000;
+  outline: 1px dotted var(--w98-text);
   outline-offset: -4px;
 }
 
@@ -121,6 +131,7 @@
   color: #fff;
   font: inherit;
   text-align: center;
+  text-shadow: 1px 1px #000;
   cursor: default;
 }
 
@@ -137,15 +148,15 @@
 }
 
 .w98-icon.is-selected .w98-icon-label {
-  background: var(--w98-navy);
-  border-color: #ffff80;
+  background: var(--w98-select);
+  border-color: var(--w98-accent);
 }
 
 .w98-icon.is-selected .w98-icon-img::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 128, 0.5);
+  background: rgba(124, 77, 204, 0.6);
   mix-blend-mode: multiply;
 }
 
@@ -154,16 +165,17 @@
 }
 
 .w98-icon:focus-visible .w98-icon-label {
-  border-color: #ffff80;
+  border-color: var(--w98-accent);
 }
 
 /* Icons that sit inside windows use black labels */
 .w98-icon.on-white {
-  color: #000;
+  color: var(--w98-text);
+  text-shadow: none;
 }
 
 .w98-icon.on-white:hover .w98-icon-label {
-  color: var(--w98-navy);
+  color: var(--w98-accent);
   text-decoration: underline;
 }
 
@@ -208,7 +220,7 @@
   height: 18px;
   padding: 0 2px 0 3px;
   background: var(--w98-title-off);
-  color: var(--w98-face);
+  color: var(--w98-title-off-text);
   font-weight: 700;
   touch-action: none;
 }
@@ -240,6 +252,7 @@
   border: 0;
   background: var(--w98-face);
   box-shadow: var(--w98-button);
+  color: var(--w98-text);
 }
 
 .w98-titlebar-controls button:active {
@@ -294,7 +307,7 @@
   border-radius: 0;
   background: var(--w98-face);
   box-shadow: var(--w98-button);
-  color: #000;
+  color: var(--w98-text);
   font: inherit;
   white-space: nowrap;
 }
@@ -311,18 +324,18 @@
 }
 
 .w98-btn:focus-visible {
-  outline: 1px dotted #000;
+  outline: 1px dotted var(--w98-text);
   outline-offset: -4px;
 }
 
 .w98-sunken {
-  background: #fff;
+  background: var(--w98-field);
   box-shadow: var(--w98-sunken);
   padding: 2px;
 }
 
 .w98-field {
-  background: #fff;
+  background: var(--w98-field);
   box-shadow: var(--w98-sunken);
   padding: 3px 4px;
   min-height: 21px;
@@ -374,13 +387,13 @@
 .w98-progress {
   height: 18px;
   padding: 2px;
-  background: #fff;
+  background: var(--w98-field);
   box-shadow: var(--w98-thin-sunken);
 }
 
 .w98-progress-fill {
   height: 100%;
-  background: repeating-linear-gradient(90deg, var(--w98-navy) 0 8px, transparent 8px 10px);
+  background: repeating-linear-gradient(90deg, var(--w98-accent) 0 8px, transparent 8px 10px);
 }
 
 .w98-radio {
@@ -396,7 +409,7 @@
   height: 12px;
   margin: 0;
   border-radius: 50%;
-  background: #fff;
+  background: var(--w98-field);
   box-shadow: inset -1px -1px var(--w98-hilite), inset 1px 1px var(--w98-shadow),
     inset -2px -2px var(--w98-light), inset 2px 2px var(--w98-dark);
   display: grid;
@@ -408,7 +421,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #000;
+  background: var(--w98-text);
 }
 
 /* ---------- Taskbar ---------- */
@@ -439,7 +452,7 @@
   box-shadow: var(--w98-button);
   font: inherit;
   font-weight: 700;
-  color: #000;
+  color: var(--w98-text);
 }
 
 .w98-start.is-pressed {
@@ -473,7 +486,7 @@
   background: var(--w98-face);
   box-shadow: var(--w98-button);
   font: inherit;
-  color: #000;
+  color: var(--w98-text);
   text-align: left;
 }
 
@@ -487,7 +500,7 @@
   box-shadow: var(--w98-pressed);
   font-weight: 700;
   background-color: var(--w98-light);
-  background-image: repeating-conic-gradient(var(--w98-hilite) 0 25%, var(--w98-face) 0 50%);
+  background-image: repeating-conic-gradient(var(--w98-light) 0 25%, var(--w98-face) 0 50%);
   background-size: 2px 2px;
 }
 
@@ -520,7 +533,7 @@
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 6px;
-  background: linear-gradient(0deg, #000080, #1084d0);
+  background: linear-gradient(0deg, #4b2380, #a77ce8);
   border: 0;
   color: #fff;
   font: inherit;
@@ -541,7 +554,7 @@
 
 .w98-startmenu-banner i {
   font-style: normal;
-  color: #c0c0c0;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .w98-startmenu ul {
@@ -562,7 +575,7 @@
   border: 0;
   background: none;
   font: inherit;
-  color: #000;
+  color: var(--w98-text);
   text-align: left;
 }
 
@@ -570,7 +583,7 @@
 .w98-startmenu li > a:hover,
 .w98-startmenu li > button:focus-visible,
 .w98-startmenu li > a:focus-visible {
-  background: var(--w98-navy);
+  background: var(--w98-select);
   color: #fff;
   outline: none;
 }
@@ -613,7 +626,7 @@
   gap: 6px 4px;
   min-height: 160px;
   padding: 8px;
-  background: #fff;
+  background: var(--w98-field);
   box-shadow: var(--w98-sunken);
 }
 
@@ -636,8 +649,8 @@
 }
 
 .w98-lcd {
-  background: #000;
-  color: #00e000;
+  background: #07050a;
+  color: var(--w98-lcd);
   font-family: "Courier New", Courier, monospace;
   box-shadow: var(--w98-sunken);
   padding: 6px 8px;
@@ -670,7 +683,7 @@
 .w98-eq i {
   flex: 1;
   height: 15%;
-  background: linear-gradient(0deg, #00c000 0 60%, #e0e000 60% 85%, #e00000 85%);
+  background: linear-gradient(0deg, #7c4dcc 0 60%, #b98cff 60% 85%, #f0c8ff 85%);
   background-size: 100% 22px;
   background-position: bottom;
 }
@@ -684,6 +697,74 @@
   30% { height: 85%; }
   60% { height: 40%; }
   100% { height: 70%; }
+}
+
+.w98-listview {
+  background: var(--w98-field);
+  box-shadow: var(--w98-sunken);
+  padding: 2px;
+}
+
+.w98-listview table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.w98-listview th {
+  padding: 2px 6px;
+  background: var(--w98-face);
+  box-shadow: var(--w98-button);
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.w98-listview td {
+  padding: 3px 6px;
+  white-space: nowrap;
+}
+
+.w98-listview tr.sub td {
+  padding-top: 6px;
+  color: var(--w98-muted);
+  font-weight: 700;
+}
+
+.w98-rank {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 16px;
+  padding: 0 3px;
+  font-weight: 700;
+  box-shadow: inset -1px -1px rgba(0, 0, 0, 0.5), inset 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* Slanted plate like the in-game CS Rating. */
+.w98-premier {
+  display: inline-flex;
+  align-items: baseline;
+  height: 20px;
+  padding: 0 10px;
+  background: #101010;
+  border-left: 4px solid;
+  border-right: 4px solid;
+  transform: skewX(-14deg);
+}
+
+.w98-premier > span {
+  display: inline-flex;
+  align-items: baseline;
+  transform: skewX(14deg);
+  line-height: 20px;
+}
+
+.w98-premier b {
+  font-size: 15px;
+}
+
+.w98-premier small {
+  font-size: 11px;
 }
 
 .w98-faceit-badge {
@@ -705,7 +786,7 @@
   place-items: center;
   padding: 16px;
   background: #000;
-  color: #ff8800;
+  color: var(--w98-lcd);
   font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(20px, 4vw, 40px);
   text-align: center;
