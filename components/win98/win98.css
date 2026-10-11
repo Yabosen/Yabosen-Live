@@ -869,6 +869,20 @@
   text-decoration: underline;
 }
 
+.w98-org-avatar {
+  display: block;
+  padding: 2px;
+  line-height: 0;
+}
+
+.w98-org-avatar img {
+  display: block;
+}
+
+.w98-org-avatar:hover {
+  box-shadow: inset 0 0 0 2px var(--w98-accent);
+}
+
 .w98-lang-dot {
   display: inline-block;
   width: 8px;

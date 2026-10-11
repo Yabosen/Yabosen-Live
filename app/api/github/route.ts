@@ -26,6 +26,13 @@ export interface GithubEvent {
   count: number
 }
 
+export interface GithubOrg {
+  login: string
+  description: string | null
+  avatarUrl: string
+  url: string
+}
+
 export interface ContributionDay {
   date: string // YYYY-MM-DD
   level: number // 0-4, GitHub's shading bucket
@@ -46,6 +53,8 @@ export interface GithubData {
   } | null
   repos: GithubRepo[]
   stars: number
+  /** Only memberships set to public on GitHub are visible. */
+  orgs: GithubOrg[]
   events: GithubEvent[]
   contributions: { total: number | null; days: ContributionDay[] } | null
   errors: string[]
@@ -155,9 +164,10 @@ export async function GET() {
       return null
     })
 
-  const [user, repos, events, graph] = await Promise.all([
+  const [user, repos, orgs, events, graph] = await Promise.all([
     settle(githubApi<any>(`/users/${USER}`)),
     settle(githubApi<any[]>(`/users/${USER}/repos?sort=pushed&per_page=100&type=owner`)),
+    settle(githubApi<any[]>(`/users/${USER}/orgs?per_page=100`)),
     settle(githubApi<any[]>(`/users/${USER}/events/public?per_page=50`)),
     settle(contributions()),
   ])
@@ -187,6 +197,12 @@ export async function GET() {
       pushedAt: r.pushed_at,
     })),
     stars: owned.reduce((sum, r) => sum + (r.stargazers_count ?? 0), 0),
+    orgs: (orgs ?? []).map((o) => ({
+      login: o.login,
+      description: o.description?.trim() || null,
+      avatarUrl: o.avatar_url,
+      url: `https://github.com/${o.login}`,
+    })),
     events: collapse(events ?? []).slice(0, 10),
     contributions: graph,
     errors,

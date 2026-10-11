@@ -7,7 +7,14 @@ import { ButtonRow, LinkButton, timeAgo, usePolledJson } from "./apps"
 const PROFILE_URL = "https://github.com/Yabosen"
 const REFRESH_MS = 10 * 60_000
 
-type Tab = "overview" | "repos" | "activity"
+type Tab = "overview" | "repos" | "orgs" | "activity"
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "repos", label: "Repositories" },
+  { id: "orgs", label: "Organizations" },
+  { id: "activity", label: "Activity" },
+]
 
 // Purple take on GitHub's green contribution scale, levels 0-4.
 const LEVEL_COLORS = ["var(--w98-field)", "#3b2560", "#5b33a0", "#8a5ad8", "#c9a8ff"]
@@ -40,16 +47,16 @@ export function GithubApp() {
   return (
     <div>
       <div className="w98-tabs" role="tablist">
-        {(["overview", "repos", "activity"] as const).map((t) => (
+        {TABS.map((t) => (
           <button
-            key={t}
+            key={t.id}
             type="button"
             role="tab"
-            aria-selected={tab === t}
-            className={`w98-tab${tab === t ? " is-active" : ""}`}
-            onClick={() => setTab(t)}
+            aria-selected={tab === t.id}
+            className={`w98-tab${tab === t.id ? " is-active" : ""}`}
+            onClick={() => setTab(t.id)}
           >
-            {t === "overview" ? "Overview" : t === "repos" ? "Repositories" : "Activity"}
+            {t.label}
           </button>
         ))}
       </div>
@@ -58,6 +65,7 @@ export function GithubApp() {
         {failed && <span>Couldn&apos;t reach GitHub right now.</span>}
         {data && tab === "overview" && <Overview data={data} />}
         {data && tab === "repos" && <Repos data={data} />}
+        {data && tab === "orgs" && <Orgs data={data} />}
         {data && tab === "activity" && <Activity data={data} />}
       </div>
 
@@ -96,6 +104,27 @@ function Overview({ data }: { data: GithubData }) {
           )}
         </div>
       </div>
+
+      {data.orgs.length > 0 && (
+        <fieldset className="w98-group">
+          <legend>Organizations</legend>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {data.orgs.map((o) => (
+              <a
+                key={o.login}
+                href={o.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={o.description ? `${o.login}: ${o.description}` : o.login}
+                className="w98-sunken w98-org-avatar"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={sized(o.avatarUrl, 56)} alt={o.login} width={28} height={28} />
+              </a>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <fieldset className="w98-group">
         <legend>Contributions</legend>
@@ -151,6 +180,11 @@ function ContributionGraph({ days, total }: { days: ContributionDay[]; total: nu
   )
 }
 
+/** GitHub avatar URL at a given pixel size. */
+function sized(url: string, px: number) {
+  return `${url}${url.includes("?") ? "&" : "?"}s=${px}`
+}
+
 function formatDay(date: string) {
   return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })
 }
@@ -177,6 +211,32 @@ function Repos({ data }: { data: GithubData }) {
             )}
             Updated {timeAgo(r.pushedAt)}
           </div>
+        </a>
+      ))}
+    </div>
+  )
+}
+
+function Orgs({ data }: { data: GithubData }) {
+  if (!data.orgs.length) return <span style={{ color: "var(--w98-muted)" }}>No public organizations.</span>
+  return (
+    <div className="w98-explorer-view" style={{ minHeight: 0 }}>
+      {data.orgs.map((o) => (
+        <a
+          key={o.login}
+          href={o.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={o.description ?? undefined}
+          className="w98-icon on-white"
+        >
+          <span className="w98-icon-img">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={sized(o.avatarUrl, 64)} alt="" width={32} height={32} style={{ display: "block" }} />
+          </span>
+          <span className="w98-icon-label" style={{ wordBreak: "break-word" }}>
+            {o.login}
+          </span>
         </a>
       ))}
     </div>
