@@ -3,6 +3,9 @@
 import { useRef, type ReactNode, type PointerEvent as ReactPointerEvent } from "react"
 import { CloseGlyph, MaximizeGlyph, MinimizeGlyph, RestoreGlyph } from "./icons"
 
+/** Smallest top offset a dragged window can have. */
+export const TOP_SAFE = 12
+
 interface Win98WindowProps {
   title: string
   icon: ReactNode
@@ -59,6 +62,8 @@ export function Win98Window({
   const onTitlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (filled || pinned || e.button !== 0) return
     if ((e.target as HTMLElement).closest("button")) return
+    // Stop the browser from starting its own drag/selection gesture.
+    e.preventDefault()
     drag.current = { px: e.clientX, py: e.clientY, x, y }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
@@ -66,12 +71,14 @@ export function Win98Window({
   const onTitlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current
     if (!d) return
+    e.preventDefault()
     const nx = d.x + e.clientX - d.px
     const ny = d.y + e.clientY - d.py
-    // Keep at least part of the title bar reachable.
+    // Keep the title bar reachable, and off the page's top edge where some
+    // browsers (Arc, Zen, Opera with hidden toolbars) drag the real window.
     onMove(
       Math.round(Math.min(Math.max(nx, 60 - w), bounds.w - 60)),
-      Math.round(Math.min(Math.max(ny, 0), bounds.h - 22)),
+      Math.round(Math.min(Math.max(ny, TOP_SAFE), bounds.h - 22)),
     )
   }
 
@@ -100,6 +107,7 @@ export function Win98Window({
         onPointerMove={onTitlePointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
+        onLostPointerCapture={endDrag}
         onDoubleClick={(e) => {
           if (!dialog && !compact && !(e.target as HTMLElement).closest("button")) onToggleMaximize()
         }}

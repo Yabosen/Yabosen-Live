@@ -78,6 +78,12 @@
   image-rendering: auto;
 }
 
+.w98 img,
+.w98 a,
+.w98 svg {
+  -webkit-user-drag: none;
+}
+
 .w98 .pixel {
   image-rendering: pixelated;
   shape-rendering: crispEdges;
@@ -217,12 +223,19 @@
   display: flex;
   align-items: center;
   gap: 3px;
-  height: 18px;
-  padding: 0 2px 0 3px;
+  height: 22px;
+  padding: 0 3px 0 4px;
   background: var(--w98-title-off);
   color: var(--w98-title-off-text);
   font-weight: 700;
   touch-action: none;
+  cursor: move;
+}
+
+.w98-window.is-maximized .w98-titlebar,
+.w98-window.is-pinned .w98-titlebar,
+.w98-titlebar-controls button {
+  cursor: default;
 }
 
 .w98-window.is-active .w98-titlebar {

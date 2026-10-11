@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/config"
 import { useCustomStatus } from "@/lib/hooks/use-custom-status"
 import { useLastFmStatus } from "@/lib/hooks/use-lastfm-status"
 import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
-import { Win98Window } from "./window"
+import { TOP_SAFE, Win98Window } from "./window"
 import {
   AboutApp,
   CreditsDialog,
@@ -99,6 +99,8 @@ interface Bounds {
 const COMPACT_BELOW = 640
 /** Room kept free on the left so the desktop icons stay visible. */
 const ICON_COLUMN = 100
+/** Windows open this far down so their title bars aren't on the page's top edge. */
+const WINDOW_TOP = 40
 
 function makeWin(id: AppId, x: number, y: number, z: number): Win {
   return { id, x, y, z, minimized: false, maximized: false }
@@ -114,26 +116,26 @@ function initialLayout({ w, h }: Bounds): Win[] {
     // Hug the left so the wallpaper's subject on the right stays visible.
     const left = ICON_COLUMN + gap
     const right = left + aboutW + gap
-    const wins = [makeWin("about", left, 24, 3), makeWin("music", right, 24, 2)]
-    if (h >= 560) wins.push(makeWin("cs", right, 250, 1))
+    const wins = [makeWin("about", left, WINDOW_TOP, 3), makeWin("music", right, WINDOW_TOP, 2)]
+    if (h >= 560) wins.push(makeWin("cs", right, WINDOW_TOP + 226, 1))
     return wins
   }
 
   return [
-    makeWin("about", ICON_COLUMN, 16, 2),
-    makeWin("music", Math.max(ICON_COLUMN, w - sideW - 16), Math.max(16, h - 260), 1),
+    makeWin("about", ICON_COLUMN, WINDOW_TOP, 2),
+    makeWin("music", Math.max(ICON_COLUMN, w - sideW - 16), Math.max(WINDOW_TOP, h - 260), 1),
   ]
 }
 
 function spawnPosition(id: AppId, openCount: number, { w, h }: Bounds) {
   const width = Math.min(APPS[id].width, w - 8)
   if (APPS[id].dialog) {
-    return { x: Math.round((w - width) / 2), y: Math.max(16, Math.round(h / 2 - 120)) }
+    return { x: Math.round((w - width) / 2), y: Math.max(WINDOW_TOP, Math.round(h / 2 - 120)) }
   }
   const step = 26 * (openCount % 6)
   return {
     x: Math.max(0, Math.min(ICON_COLUMN + 20 + step, w - width - 8)),
-    y: Math.max(0, Math.min(20 + step, h - 220)),
+    y: Math.max(TOP_SAFE, Math.min(WINDOW_TOP + step, h - 220)),
   }
 }
 
@@ -291,7 +293,9 @@ export function Win98Desktop() {
   }
 
   return (
-    <div className="w98">
+    // No native drag-and-drop anywhere on the desktop: dragging an image or link
+    // otherwise starts the browser's own drag instead of moving our windows.
+    <div className="w98" onDragStart={(e) => e.preventDefault()}>
       <RickRollEasterEgg />
 
       <div
