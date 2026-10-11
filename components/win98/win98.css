@@ -869,6 +869,12 @@
   text-decoration: underline;
 }
 
+.w98-skin-stage {
+  padding: 10px 14px;
+  background: radial-gradient(circle at 50% 35%, #2b2434, var(--w98-field) 70%);
+  line-height: 0;
+}
+
 .w98-org-avatar {
   display: block;
   padding: 2px;

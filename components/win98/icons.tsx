@@ -169,6 +169,34 @@ export function RecycleBinIcon(props: IconProps) {
   )
 }
 
+/** A grass block, front face. */
+export function GrassBlockIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3" y="3" width="26" height="26" fill="#000" />
+      {/* dirt */}
+      <rect x="4" y="4" width="24" height="24" fill="#8b5a2b" />
+      <rect x="7" y="17" width="2" height="2" fill="#6b4220" />
+      <rect x="14" y="21" width="2" height="2" fill="#6b4220" />
+      <rect x="21" y="16" width="2" height="2" fill="#6b4220" />
+      <rect x="10" y="24" width="2" height="2" fill="#a5713d" />
+      <rect x="23" y="23" width="2" height="2" fill="#a5713d" />
+      <rect x="17" y="18" width="2" height="1" fill="#a5713d" />
+      {/* grass with a ragged edge */}
+      <rect x="4" y="4" width="24" height="8" fill="#5da130" />
+      <rect x="4" y="12" width="3" height="2" fill="#5da130" />
+      <rect x="9" y="12" width="2" height="3" fill="#5da130" />
+      <rect x="13" y="12" width="4" height="2" fill="#5da130" />
+      <rect x="19" y="12" width="2" height="3" fill="#5da130" />
+      <rect x="23" y="12" width="5" height="2" fill="#5da130" />
+      <rect x="4" y="4" width="24" height="2" fill="#7cc242" />
+      <rect x="8" y="7" width="2" height="2" fill="#4a8526" />
+      <rect x="18" y="8" width="2" height="2" fill="#4a8526" />
+      <rect x="24" y="6" width="2" height="2" fill="#7cc242" />
+    </Svg>
+  )
+}
+
 /** A git branch graph on a dark tile. */
 export function GitHubIcon(props: IconProps) {
   return (

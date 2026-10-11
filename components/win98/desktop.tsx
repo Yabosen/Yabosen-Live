@@ -8,6 +8,7 @@ import { useLastFmStatus } from "@/lib/hooks/use-lastfm-status"
 import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
 import { TOP_SAFE, Win98Window } from "./window"
 import { GithubApp } from "./github"
+import { MinecraftApp } from "./minecraft"
 import {
   AboutApp,
   CreditsDialog,
@@ -27,6 +28,7 @@ import {
   ComputerIcon,
   CrosshairIcon,
   GitHubIcon,
+  GrassBlockIcon,
   FolderIcon,
   GlobeIcon,
   HeartIcon,
@@ -40,7 +42,7 @@ import {
 } from "./icons"
 import "./win98.css"
 
-type AppId = "about" | "links" | "music" | "cs" | "github" | "recycle" | "credits" | "shutdown"
+type AppId = "about" | "links" | "music" | "cs" | "github" | "minecraft" | "recycle" | "credits" | "shutdown"
 
 interface AppDef {
   title: string
@@ -59,6 +61,7 @@ const APPS: Record<AppId, AppDef> = {
   music: { title: "Now Playing", icon: (s) => <CdIcon size={s} />, width: 340 },
   cs: { title: "CS Stats", icon: (s) => <CrosshairIcon size={s} />, width: 360 },
   github: { title: "GitHub", icon: (s) => <GitHubIcon size={s} />, width: 400 },
+  minecraft: { title: "Minecraft", icon: (s) => <GrassBlockIcon size={s} />, width: 400 },
   recycle: { title: "Recycle Bin", icon: (s) => <RecycleBinIcon size={s} />, width: 380, flush: true, menu: EXPLORER_MENU },
   credits: { title: "Credits", icon: (s) => <InfoIcon size={s} />, width: 300, dialog: true },
   shutdown: { title: "Shut Down Windows", icon: (s) => <ShutdownIcon size={s} />, width: 340, dialog: true },
@@ -79,6 +82,7 @@ const DESKTOP_ICONS: DesktopIcon[] = [
   { key: "music", label: "Now Playing", icon: <CdIcon />, open: "music" },
   { key: "cs", label: "CS Stats", icon: <CrosshairIcon />, open: "cs" },
   { key: "github", label: "GitHub", icon: <GitHubIcon />, open: "github" },
+  { key: "minecraft", label: "Minecraft", icon: <GrassBlockIcon />, open: "minecraft" },
   { key: "socials", label: "Socials", icon: <NetworkIcon />, href: "/socials" },
   { key: "old", label: "Old Site", icon: <GlobeIcon />, href: "/old" },
   { key: "donate", label: "Donate", icon: <HeartIcon />, href: siteConfig.donateUrl, external: true },
@@ -291,6 +295,8 @@ export function Win98Desktop() {
         return <CsApp />
       case "github":
         return <GithubApp />
+      case "minecraft":
+        return <MinecraftApp />
       case "recycle":
         return <RecycleBinApp />
       case "credits":
@@ -441,6 +447,14 @@ export function Win98Desktop() {
                     <GitHubIcon size={24} />
                     <span>
                       <u>G</u>itHub
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" role="menuitem" onClick={() => open("minecraft")}>
+                    <GrassBlockIcon size={24} />
+                    <span>
+                      <u>M</u>inecraft
                     </span>
                   </button>
                 </li>
