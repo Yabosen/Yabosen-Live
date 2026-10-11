@@ -36,6 +36,9 @@
   --w98-title-off: linear-gradient(90deg, #3a3346, #5a5168);
   --w98-title-off-text: #9a90aa;
   --w98-taskbar-h: 30px;
+  --w98-cursor: url("/cursors/arrow.svg") 0 0, default;
+  --w98-cursor-link: url("/cursors/hand.svg") 5 0, pointer;
+  --w98-cursor-move: url("/cursors/move.svg") 10 10, move;
 
   --w98-raised: inset -1px -1px var(--w98-dark), inset 1px 1px var(--w98-light),
     inset -2px -2px var(--w98-shadow), inset 2px 2px var(--w98-hilite);
@@ -60,7 +63,7 @@
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
-  cursor: default;
+  cursor: var(--w98-cursor);
 }
 
 .w98 *,
@@ -72,6 +75,14 @@
 .w98 a {
   color: inherit;
   text-decoration: none;
+  cursor: var(--w98-cursor-link);
+}
+
+/* Browsers give form controls their own cursor; keep ours. */
+.w98 button,
+.w98 input,
+.w98 label {
+  cursor: var(--w98-cursor);
 }
 
 .w98 img {
@@ -138,7 +149,7 @@
   font: inherit;
   text-align: center;
   text-shadow: 1px 1px #000;
-  cursor: default;
+  cursor: var(--w98-cursor);
 }
 
 .w98-icon-img {
@@ -229,13 +240,13 @@
   color: var(--w98-title-off-text);
   font-weight: 700;
   touch-action: none;
-  cursor: move;
+  cursor: var(--w98-cursor-move);
 }
 
 .w98-window.is-maximized .w98-titlebar,
 .w98-window.is-pinned .w98-titlebar,
 .w98-titlebar-controls button {
-  cursor: default;
+  cursor: var(--w98-cursor);
 }
 
 .w98-window.is-active .w98-titlebar {
@@ -803,7 +814,7 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(20px, 4vw, 40px);
   text-align: center;
-  cursor: pointer;
+  cursor: var(--w98-cursor-link);
 }
 
 .w98-shutdown-screen small {
