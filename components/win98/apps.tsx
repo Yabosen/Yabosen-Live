@@ -272,7 +272,7 @@ export function RecycleBinApp() {
 
 // ---------- Now Playing (Last.fm) ----------
 
-const LASTFM_PROFILE = "https://www.last.fm/user/LutyLutanu606"
+const LASTFM_PROFILE = "https://www.last.fm/user/Yabosen"
 
 export function MusicApp({ lastfm, loading }: { lastfm: LastFmInfo; loading: boolean }) {
   const loadedOnce = useRef(false)
