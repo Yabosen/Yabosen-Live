@@ -120,19 +120,24 @@ function initialLayout({ w, h }: Bounds): Win[] {
   const gap = 16
   const aboutW = APPS.about.width
   const sideW = APPS.music.width
+  const mcW = APPS.minecraft.width
   if (w >= ICON_COLUMN + aboutW + gap + sideW + gap) {
     // Hug the left so the wallpaper's subject on the right stays visible.
     const left = ICON_COLUMN + gap
     const right = left + aboutW + gap
-    const wins = [makeWin("about", left, WINDOW_TOP, 3), makeWin("music", right, WINDOW_TOP, 2)]
-    if (h >= 560) wins.push(makeWin("cs", right, WINDOW_TOP + 226, 1))
+    // Minecraft gets a third column when there's room, otherwise it overlaps the second.
+    const third = Math.min(right + APPS.cs.width + gap, w - mcW - gap)
+    const wins = [makeWin("about", left, WINDOW_TOP, 5), makeWin("music", right, WINDOW_TOP, 3)]
+    if (h >= 560) wins.push(makeWin("cs", right, WINDOW_TOP + 226, 2))
     // Tall screens also get the GitHub window under About.
     if (h >= 760) wins.push(makeWin("github", left, WINDOW_TOP + 312, 1))
+    wins.push(makeWin("minecraft", third, WINDOW_TOP, 4))
     return wins
   }
 
   return [
-    makeWin("about", ICON_COLUMN, WINDOW_TOP, 2),
+    makeWin("about", ICON_COLUMN, WINDOW_TOP, 3),
+    makeWin("minecraft", Math.max(ICON_COLUMN + 40, w - mcW - gap), WINDOW_TOP + 20, 2),
     makeWin("music", Math.max(ICON_COLUMN, w - sideW - 16), Math.max(WINDOW_TOP, h - 260), 1),
   ]
 }
