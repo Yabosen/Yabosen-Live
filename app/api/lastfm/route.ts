@@ -3,6 +3,10 @@ import { NextResponse } from 'next/server'
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY
 const LASTFM_USERNAME = process.env.LASTFM_USERNAME || "LutyLutanu606"
 
+// Visitors poll every 15 s. A 10 s CDN cache keeps Last.fm calls bounded while
+// a track change still shows up within ~25 s at worst.
+const CACHE_CONTROL = 'public, s-maxage=10, stale-while-revalidate=5'
+
 export async function GET() {
     try {
         if (!LASTFM_API_KEY) {
@@ -11,7 +15,7 @@ export async function GET() {
                 {
                     status: 200,
                     headers: {
-                        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+                        'Cache-Control': CACHE_CONTROL,
                     },
                 }
             )
@@ -19,7 +23,7 @@ export async function GET() {
 
         const response = await fetch(
             `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1`,
-            { next: { revalidate: 30 } }
+            { cache: 'no-store' }
         )
 
         if (!response.ok) {
@@ -33,7 +37,7 @@ export async function GET() {
                 { isPlaying: false },
                 {
                     headers: {
-                        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+                        'Cache-Control': CACHE_CONTROL,
                     },
                 }
             )
@@ -55,7 +59,7 @@ export async function GET() {
             },
             {
                 headers: {
-                    'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+                    'Cache-Control': CACHE_CONTROL,
                 },
             }
         )
