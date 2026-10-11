@@ -7,6 +7,7 @@ import { useCustomStatus } from "@/lib/hooks/use-custom-status"
 import { useLastFmStatus } from "@/lib/hooks/use-lastfm-status"
 import { RickRollEasterEgg } from "@/components/rickroll-easter-egg"
 import { TOP_SAFE, Win98Window } from "./window"
+import { GithubApp } from "./github"
 import {
   AboutApp,
   CreditsDialog,
@@ -25,6 +26,7 @@ import {
   CdIcon,
   ComputerIcon,
   CrosshairIcon,
+  GitHubIcon,
   FolderIcon,
   GlobeIcon,
   HeartIcon,
@@ -38,7 +40,7 @@ import {
 } from "./icons"
 import "./win98.css"
 
-type AppId = "about" | "links" | "music" | "cs" | "recycle" | "credits" | "shutdown"
+type AppId = "about" | "links" | "music" | "cs" | "github" | "recycle" | "credits" | "shutdown"
 
 interface AppDef {
   title: string
@@ -56,6 +58,7 @@ const APPS: Record<AppId, AppDef> = {
   links: { title: "Links", icon: (s) => <FolderIcon size={s} />, width: 440, flush: true, menu: EXPLORER_MENU },
   music: { title: "Now Playing", icon: (s) => <CdIcon size={s} />, width: 340 },
   cs: { title: "CS Stats", icon: (s) => <CrosshairIcon size={s} />, width: 360 },
+  github: { title: "GitHub", icon: (s) => <GitHubIcon size={s} />, width: 400 },
   recycle: { title: "Recycle Bin", icon: (s) => <RecycleBinIcon size={s} />, width: 380, flush: true, menu: EXPLORER_MENU },
   credits: { title: "Credits", icon: (s) => <InfoIcon size={s} />, width: 300, dialog: true },
   shutdown: { title: "Shut Down Windows", icon: (s) => <ShutdownIcon size={s} />, width: 340, dialog: true },
@@ -75,6 +78,7 @@ const DESKTOP_ICONS: DesktopIcon[] = [
   { key: "links", label: "Links", icon: <FolderIcon />, open: "links" },
   { key: "music", label: "Now Playing", icon: <CdIcon />, open: "music" },
   { key: "cs", label: "CS Stats", icon: <CrosshairIcon />, open: "cs" },
+  { key: "github", label: "GitHub", icon: <GitHubIcon />, open: "github" },
   { key: "socials", label: "Socials", icon: <NetworkIcon />, href: "/socials" },
   { key: "old", label: "Old Site", icon: <GlobeIcon />, href: "/old" },
   { key: "donate", label: "Donate", icon: <HeartIcon />, href: siteConfig.donateUrl, external: true },
@@ -118,6 +122,8 @@ function initialLayout({ w, h }: Bounds): Win[] {
     const right = left + aboutW + gap
     const wins = [makeWin("about", left, WINDOW_TOP, 3), makeWin("music", right, WINDOW_TOP, 2)]
     if (h >= 560) wins.push(makeWin("cs", right, WINDOW_TOP + 226, 1))
+    // Tall screens also get the GitHub window under About.
+    if (h >= 760) wins.push(makeWin("github", left, WINDOW_TOP + 312, 1))
     return wins
   }
 
@@ -283,6 +289,8 @@ export function Win98Desktop() {
         return <MusicApp lastfm={lastfm} loading={lastfmLoading} />
       case "cs":
         return <CsApp />
+      case "github":
+        return <GithubApp />
       case "recycle":
         return <RecycleBinApp />
       case "credits":
@@ -425,6 +433,14 @@ export function Win98Desktop() {
                     <CrosshairIcon size={24} />
                     <span>
                       <u>C</u>S Stats
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" role="menuitem" onClick={() => open("github")}>
+                    <GitHubIcon size={24} />
+                    <span>
+                      <u>G</u>itHub
                     </span>
                   </button>
                 </li>

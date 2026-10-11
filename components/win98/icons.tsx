@@ -169,6 +169,31 @@ export function RecycleBinIcon(props: IconProps) {
   )
 }
 
+/** A git branch graph on a dark tile. */
+export function GitHubIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3" y="3" width="26" height="26" fill="#000" />
+      <rect x="4" y="4" width="24" height="24" fill="#24292f" />
+      <rect x="4" y="4" width="24" height="1" fill="#57606a" />
+      <rect x="4" y="4" width="1" height="24" fill="#57606a" />
+      {/* main line */}
+      <rect x="11" y="9" width="2" height="14" fill="#c9a8ff" />
+      {/* branch curving off to the right */}
+      <rect x="13" y="17" width="3" height="2" fill="#c9a8ff" />
+      <rect x="16" y="15" width="2" height="2" fill="#c9a8ff" />
+      <rect x="18" y="13" width="2" height="2" fill="#c9a8ff" />
+      {/* commits */}
+      <rect x="9" y="6" width="6" height="5" fill="#000" />
+      <rect x="10" y="7" width="4" height="3" fill="#e8defa" />
+      <rect x="9" y="22" width="6" height="5" fill="#000" />
+      <rect x="10" y="23" width="4" height="3" fill="#e8defa" />
+      <rect x="18" y="8" width="6" height="5" fill="#000" />
+      <rect x="19" y="9" width="4" height="3" fill="#7c4dcc" />
+    </Svg>
+  )
+}
+
 export function InfoIcon(props: IconProps) {
   return (
     <Svg {...props}>

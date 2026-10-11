@@ -81,7 +81,7 @@ export function StatusDot({ status, size = 10 }: { status: StatusType; size?: nu
   )
 }
 
-function ButtonRow({ children }: { children: ReactNode }) {
+export function ButtonRow({ children }: { children: ReactNode }) {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 6, marginTop: 10 }}>
       {children}
@@ -89,7 +89,7 @@ function ButtonRow({ children }: { children: ReactNode }) {
   )
 }
 
-function LinkButton({ href, children, internal }: { href: string; children: ReactNode; internal?: boolean }) {
+export function LinkButton({ href, children, internal }: { href: string; children: ReactNode; internal?: boolean }) {
   return (
     <a
       className="w98-btn"
@@ -404,16 +404,19 @@ function mapName(id: string) {
   return bare.charAt(0).toUpperCase() + bare.slice(1)
 }
 
-function timeAgo(iso: string) {
+export function timeAgo(iso: string) {
   const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
   if (mins < 60) return `${mins} min ago`
   const hours = Math.round(mins / 60)
   if (hours < 48) return `${hours} hour${hours === 1 ? "" : "s"} ago`
-  return `${Math.round(hours / 24)} days ago`
+  const days = Math.round(hours / 24)
+  if (days < 60) return `${days} days ago`
+  if (days < 730) return `${Math.round(days / 30)} months ago`
+  return `${Math.round(days / 365)} years ago`
 }
 
 /** Fetches JSON now and every `intervalMs`, keeping the last good result on errors. */
-function usePolledJson<T>(url: string, intervalMs: number) {
+export function usePolledJson<T>(url: string, intervalMs: number) {
   const [data, setData] = useState<T | null>(null)
   const [failed, setFailed] = useState(false)
 
