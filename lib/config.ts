@@ -26,6 +26,8 @@ export const siteConfig = {
   // Counter-Strike Stats
   csStats: {
     enabled: true,
+    // Steam64 ID of steamcommunity.com/id/Yabosen — used to pull live CS2 ranks from Leetify
+    steam64: "76561198981651703",
     links: [
       {
         name: "Leetify Profile",
